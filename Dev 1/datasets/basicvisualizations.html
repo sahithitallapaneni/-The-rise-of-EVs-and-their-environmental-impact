@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Data Visualizations</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .chart {
+            display: inline-block;
+            margin: 20px;
+        }
+        svg {
+            font: 10px sans-serif;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            shape-rendering: crispEdges;
+        }
+    </style>
+</head>
+<body>
+    <h1>EV Data Visualizations</h1>
+
+    <div id="charging-points-chart" class="chart">
+        <h2>EV Charging Points Over Time</h2>
+    </div>
+    <div id="sales-chart" class="chart">
+        <h2>EV Sales Over Time (Buses, Cars, Trucks)</h2>
+    </div>
+    <div id="electricity-demand-chart" class="chart">
+        <h2>Electricity Demand Over Time (Buses, Cars, Trucks)</h2>
+    </div>
+
+    <script>
+        // Load and visualize EV Charging Points data
+        d3.csv("Dev 1/datasets/EV charging pointsHistoricalEV.csv").then(function(data) {
+            const svg = d3.select("#charging-points-chart")
+                          .append("svg")
+                          .attr("width", 600)
+                          .attr("height", 400);
+            const margin = { top: 40, right: 20, bottom: 50, left: 60 };
+            const width = 600 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+            
+            const g = svg.append("g")
+                         .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleLinear()
+                        .domain(d3.extent(data, d => +d.year))
+                        .range([0, width]);
+
+            const y = d3.scaleLinear()
+                        .domain([0, d3.max(data, d => +d.value)])
+                        .range([height, 0]);
+
+            g.append("g")
+             .attr("transform", `translate(0,${height})`)
+             .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+            g.append("g").call(d3.axisLeft(y));
+
+            g.append("path")
+             .datum(data)
+             .attr("fill", "none")
+             .attr("stroke", "steelblue")
+             .attr("stroke-width", 1.5)
+             .attr("d", d3.line()
+                          .x(d => x(+d.year))
+                          .y(d => y(+d.value)));
+        });
+
+        // Load and visualize EV Sales data (Buses, Cars, Trucks)
+        d3.csv("Dev 1/datasets/EV salesHistoricalBuses.csv").then(function(buses) {
+            d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(cars) {
+                d3.csv("Dev 1/datasets/EV salesHistoricalTrucks.csv").then(function(trucks) {
+                    const svg = d3.select("#sales-chart")
+                                  .append("svg")
+                                  .attr("width", 600)
+                                  .attr("height", 400);
+
+                    const margin = { top: 40, right: 20, bottom: 50, left: 60 };
+                    const width = 600 - margin.left - margin.right;
+                    const height = 400 - margin.top - margin.bottom;
+
+                    const g = svg.append("g")
+                                 .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                    const x = d3.scaleLinear()
+                                .domain([2010, 2024])
+                                .range([0, width]);
+
+                    const y = d3.scaleLinear()
+                                .domain([0, d3.max([...buses, ...cars, ...trucks], d => +d.value)])
+                                .range([height, 0]);
+
+                    g.append("g")
+                     .attr("transform", `translate(0,${height})`)
+                     .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+                    g.append("g").call(d3.axisLeft(y));
+
+                    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                    function plotLine(data, name) {
+                        g.append("path")
+                         .datum(data)
+                         .attr("fill", "none")
+                         .attr("stroke", color(name))
+                         .attr("stroke-width", 1.5)
+                         .attr("d", d3.line()
+                                      .x(d => x(+d.year))
+                                      .y(d => y(+d.value)));
+                    }
+
+                    plotLine(buses, "Buses");
+                    plotLine(cars, "Cars");
+                    plotLine(trucks, "Trucks");
+                });
+            });
+        });
+
+        // Load and visualize Electricity Demand data (Buses, Cars, Trucks)
+        d3.csv("Dev 1/datasets/Electricity demandHistoricalBuses.csv").then(function(buses) {
+            d3.csv("Dev 1/datasets/Electricity demandHistoricalCars.csv").then(function(cars) {
+                d3.csv("Dev 1/datasets/Electricity demandHistoricalTrucks.csv").then(function(trucks) {
+                    const svg = d3.select("#electricity-demand-chart")
+                                  .append("svg")
+                                  .attr("width", 600)
+                                  .attr("height", 400);
+
+                    const margin = { top: 40, right: 20, bottom: 50, left: 60 };
+                    const width = 600 - margin.left - margin.right;
+                    const height = 400 - margin.top - margin.bottom;
+
+                    const g = svg.append("g")
+                                 .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                    const x = d3.scaleLinear()
+                                .domain([2010, 2024])
+                                .range([0, width]);
+
+                    const y = d3.scaleLinear()
+                                .domain([0, d3.max([...buses, ...cars, ...trucks], d => +d.value)])
+                                .range([height, 0]);
+
+                    g.append("g")
+                     .attr("transform", `translate(0,${height})`)
+                     .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+                    g.append("g").call(d3.axisLeft(y));
+
+                    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                    function plotLine(data, name) {
+                        g.append("path")
+                         .datum(data)
+                         .attr("fill", "none")
+                         .attr("stroke", color(name))
+                         .attr("stroke-width", 1.5)
+                         .attr("d", d3.line()
+                                      .x(d => x(+d.year))
+                                      .y(d => y(+d.value)));
+                    }
+
+                    plotLine(buses, "Buses");
+                    plotLine(cars, "Cars");
+                    plotLine(trucks, "Trucks");
+                });
+            });
+        });
+    </script>
+</body>
+</html>
