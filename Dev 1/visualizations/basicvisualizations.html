@@ -35,7 +35,7 @@
 
     <script>
         // Load and visualize EV Charging Points data
-        d3.csv("EV charging pointsHistoricalEV.csv").then(function(data) {
+        d3.csv("Dev 1/datasets/EV charging pointsHistoricalEV.csv").then(function(data) {
             const svg = d3.select("#charging-points-chart")
                           .append("svg")
                           .attr("width", 600)
@@ -72,9 +72,9 @@
         });
 
         // Load and visualize EV Sales data (Buses, Cars, Trucks)
-        d3.csv("EV salesHistoricalBuses.csv").then(function(buses) {
-            d3.csv("EV salesHistoricalCars.csv").then(function(cars) {
-                d3.csv("EV salesHistoricalTrucks.csv").then(function(trucks) {
+        d3.csv("Dev 1/datasets/EV salesHistoricalBuses.csv").then(function(buses) {
+            d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(cars) {
+                d3.csv("Dev 1/datasets/EV salesHistoricalTrucks.csv").then(function(trucks) {
                     const svg = d3.select("#sales-chart")
                                   .append("svg")
                                   .attr("width", 600)
@@ -122,9 +122,9 @@
         });
 
         // Load and visualize Electricity Demand data (Buses, Cars, Trucks)
-        d3.csv("Electricity demandHistoricalBuses.csv").then(function(buses) {
-            d3.csv("Electricity demandHistoricalCars.csv").then(function(cars) {
-                d3.csv("Electricity demandHistoricalTrucks.csv").then(function(trucks) {
+        d3.csv("Dev 1/datasets/Electricity demandHistoricalBuses.csv").then(function(buses) {
+            d3.csv("Dev 1/datasets/Electricity demandHistoricalCars.csv").then(function(cars) {
+                d3.csv("Dev 1/datasets/Electricity demandHistoricalTrucks.csv").then(function(trucks) {
                     const svg = d3.select("#electricity-demand-chart")
                                   .append("svg")
                                   .attr("width", 600)
