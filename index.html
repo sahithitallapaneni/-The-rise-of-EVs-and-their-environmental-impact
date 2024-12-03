@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EV Charging Points Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .bar {
+            fill: steelblue;
+        }
+        .bar:hover {
+            fill: orange;
+        }
+        .axis-label {
+            font-size: 12px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>EV Charging Points Over Years</h1>
+    <svg width="800" height="500"></svg>
+
+    <script>
+        // Load the data from the CSV file
+        d3.csv("Dev 1/datasets/EV charging pointsHistoricalEV.csv").then(function(data) {
+            // Parse the data and filter by a specific region if needed
+            data.forEach(d => {
+                d.year = +d.year;  // Convert year to number
+                d.value = +d.value;  // Convert value to number
+            });
+
+            // Set up the SVG canvas dimensions
+            const svg = d3.select("svg");
+            const margin = { top: 40, right: 30, bottom: 50, left: 70 };
+            const width = svg.attr("width") - margin.left - margin.right;
+            const height = svg.attr("height") - margin.top - margin.bottom;
+
+            const g = svg.append("g")
+                         .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Set up scales
+            const x = d3.scaleBand()
+                        .domain(data.map(d => d.year))
+                        .range([0, width])
+                        .padding(0.1);
+
+            const y = d3.scaleLinear()
+                        .domain([0, d3.max(data, d => d.value)])
+                        .nice()
+                        .range([height, 0]);
+
+            // X-axis
+            g.append("g")
+             .attr("transform", `translate(0,${height})`)
+             .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+             .selectAll("text")
+             .attr("class", "axis-label");
+
+            // Y-axis
+            g.append("g")
+             .call(d3.axisLeft(y))
+             .selectAll("text")
+             .attr("class", "axis-label");
+
+            // Bars
+            g.selectAll(".bar")
+             .data(data)
+             .enter().append("rect")
+             .attr("class", "bar")
+             .attr("x", d => x(d.year))
+             .attr("y", d => y(d.value))
+             .attr("width", x.bandwidth())
+             .attr("height", d => height - y(d.value));
+        });
+    </script>
+</body>
+</html>
