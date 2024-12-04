@@ -102,7 +102,7 @@
             }
         }
 
-        /* Line Chart Container */
+        /* bar Chart Container */
         #bar-chart {
             width: 100%;
             height: 600px;
@@ -116,6 +116,11 @@
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+         #line-chart {
+        width: 800px;
+        height: 500px;
+        margin: 0 auto;
+    }
 
     </style>
 </head>
@@ -205,6 +210,87 @@
         <div class="content-section">
             <p>EVs significantly reduce greenhouse gas emissions compared to traditional vehicles. However, understanding their full environmental impact requires considering electricity sources and battery production emissions.</p>
         </div>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    // Set up the chart dimensions
+    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+          width = 800 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+
+    // Create SVG container
+    const svg = d3.select("#line-chart")
+                  .append("svg")
+                  .attr("width", width + margin.left + margin.right)
+                  .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Load the CSV data
+    d3.csv("Dev 1/datasets/co2emissions.csv").then(data => {
+        // Parse data
+        data.forEach(d => {
+            d.Year = +d.Year;
+            d["Total CO2 Emissions Reduction (kg)"] = +d["Total CO2 Emissions Reduction (kg)"];
+        });
+
+        // Set up X and Y scales
+        const x = d3.scaleLinear()
+                    .domain(d3.extent(data, d => d.Year))
+                    .range([0, width]);
+
+        const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d["Total CO2 Emissions Reduction (kg)"])])
+                    .range([height, 0]);
+
+        // Add X axis
+        svg.append("g")
+           .attr("transform", `translate(0,${height})`)
+           .call(d3.axisBottom(x).tickFormat(d3.format("d"))); // Year format
+
+        // Add Y axis
+        svg.append("g")
+           .call(d3.axisLeft(y));
+
+        // Line generator
+        const line = d3.line()
+                       .x(d => x(d.Year))
+                       .y(d => y(d["Total CO2 Emissions Reduction (kg)"]));
+
+        // Bind data and draw line for each region
+        const regions = Array.from(new Set(data.map(d => d.Region)));
+        const color = d3.scaleOrdinal(d3.schemeCategory10).domain(regions);
+
+        regions.forEach(region => {
+            const regionData = data.filter(d => d.Region === region);
+            svg.append("path")
+               .datum(regionData)
+               .attr("fill", "none")
+               .attr("stroke", color(region))
+               .attr("stroke-width", 2)
+               .attr("d", line);
+        });
+
+        // Add legend
+        const legend = svg.append("g")
+                          .attr("transform", `translate(${width - 150}, 20)`);
+
+        regions.forEach((region, i) => {
+            legend.append("rect")
+                  .attr("x", 0)
+                  .attr("y", i * 20)
+                  .attr("width", 10)
+                  .attr("height", 10)
+                  .style("fill", color(region));
+
+            legend.append("text")
+                  .attr("x", 20)
+                  .attr("y", i * 20 + 9)
+                  .text(region)
+                  .attr("alignment-baseline", "middle");
+        });
+    });
+</script>
+
 
         <!-- Section 3: Heat Map and Scatter Plot -->
         <div class="section-title">Heat Map and Scatter Plot</div>
