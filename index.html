@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rise of EVs & Environmental Impact</title>
+    <title>Stacked Bar Chart - Emissions by Country</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,130 +12,128 @@
             background-color: #f5f7fa;
             color: #333;
         }
-        header {
-            color: black;
-            text-align: center;
-            padding: 80px 20px;
-        }
-        header h1 {
-            font-size: 4rem;
-            margin: 0;
-            animation: fadeIn 2s ease-in-out;
-        }
         .section-title {
             font-size: 2.5rem;
             text-align: center;
-            margin: 60px 0 20px;
-            color: #2c3e50;
+            margin: 40px 0;
         }
-        .container {
-            max-width: 1200px;
+        .chart-container {
+            width: 900px;
             margin: 0 auto;
-            padding: 20px;
         }
-        .content-section {
-            margin-bottom: 60px;
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        #line-chart {
+        #stacked-bar-chart {
             width: 100%;
-            height: 500px;
+            height: 600px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Rise of EVs & Their Environmental Impact</h1>
-    </header>
-    <div class="container">
-        <!-- Section: Emissions of Battery Production -->
-        <div class="section-title">Emissions of Battery Production</div>
-        <div class="content-section">
-            <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
-            <div id="line-chart"></div>
-        </div>
+    <div class="section-title">Stacked Bar Chart (Emissions by Country and Emission Type)</div>
+    <div class="chart-container">
+        <div id="stacked-bar-chart"></div>
     </div>
+
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
         // Load the CSV data
         d3.csv("Dev 1/datasets/battery_emissions_dataset.csv").then(function(data) {
             const margin = { top: 50, right: 30, bottom: 50, left: 60 },
                   width = 800 - margin.left - margin.right,
-                  height = 500 - margin.top - margin.bottom;
+                  height = 600 - margin.top - margin.bottom;
 
-            const svg = d3.select("#line-chart")
+            const svg = d3.select("#stacked-bar-chart")
                           .append("svg")
                           .attr("width", width + margin.left + margin.right)
                           .attr("height", height + margin.top + margin.bottom)
                           .append("g")
                           .attr("transform", `translate(${margin.left},${margin.top})`);
 
-            // Parse data
+            // Prepare data for the stack layout
+            const emissionTypes = ["Mining Emissions (kg CO2e)", "Processing Emissions (kg CO2e)"];
+            const countries = Array.from(new Set(data.map(d => d.Country)));
+
             data.forEach(d => {
-                d.Year = +d.Year;
-                d["Total Emissions (kg CO2e)"] = +d["Total Emissions (kg CO2e)"];
+                d["Mining Emissions (kg CO2e)"] = +d["Mining Emissions (kg CO2e)"];
+                d["Processing Emissions (kg CO2e)"] = +d["Processing Emissions (kg CO2e)"];
             });
 
-            // Group data by country
-            const groupedData = d3.group(data, d => d.Country);
+            // Group by country and sum emissions
+            const emissionsByCountry = d3.rollup(
+                data,
+                v => ({
+                    "Mining Emissions (kg CO2e)": d3.sum(v, d => d["Mining Emissions (kg CO2e)"]),
+                    "Processing Emissions (kg CO2e)": d3.sum(v, d => d["Processing Emissions (kg CO2e)"])
+                }),
+                d => d.Country
+            );
 
-            // X scale (Years)
-            const x = d3.scaleLinear()
-                        .domain(d3.extent(data, d => d.Year))
-                        .range([0, width]);
+            const formattedData = Array.from(emissionsByCountry, ([key, values]) => ({
+                Country: key,
+                ...values
+            }));
 
-            // Y scale (Total Emissions)
+            // Stack layout
+            const stack = d3.stack().keys(emissionTypes);
+            const stackedData = stack(formattedData);
+
+            // X-axis scale
+            const x = d3.scaleBand()
+                        .domain(countries)
+                        .range([0, width])
+                        .padding(0.2);
+
+            // Y-axis scale
             const y = d3.scaleLinear()
-                        .domain([0, d3.max(data, d => d["Total Emissions (kg CO2e)"])])
+                        .domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])])
                         .range([height, 0]);
 
             // X-axis
             svg.append("g")
                .attr("transform", `translate(0,${height})`)
-               .call(d3.axisBottom(x).ticks(5).tickFormat(d3.format("d")));
+               .call(d3.axisBottom(x));
 
             // Y-axis
             svg.append("g")
                .call(d3.axisLeft(y));
 
-            // Color scale for each country
-            const color = d3.scaleOrdinal(d3.schemeCategory10);
+            // Color scale
+            const color = d3.scaleOrdinal()
+                            .domain(emissionTypes)
+                            .range(["#1f77b4", "#ff7f0e"]);
 
-            // Draw the lines
-            groupedData.forEach((values, key) => {
-                svg.append("path")
-                   .datum(values)
-                   .attr("fill", "none")
-                   .attr("stroke", color(key))
-                   .attr("stroke-width", 1.5)
-                   .attr("d", d3.line()
-                                .x(d => x(d.Year))
-                                .y(d => y(d["Total Emissions (kg CO2e)"])));
-            });
+            // Draw bars
+            svg.selectAll("g.layer")
+               .data(stackedData)
+               .enter()
+               .append("g")
+               .attr("class", "layer")
+               .attr("fill", d => color(d.key))
+               .selectAll("rect")
+               .data(d => d)
+               .enter()
+               .append("rect")
+               .attr("x", d => x(d.data.Country))
+               .attr("y", d => y(d[1]))
+               .attr("height", d => y(d[0]) - y(d[1]))
+               .attr("width", x.bandwidth());
 
-            // Add legend
+            // Legend
             const legend = svg.append("g")
-                              .attr("transform", `translate(${width - 100},0)`);
+                              .attr("transform", `translate(${width - 150},20)`);
 
-            let i = 0;
-            groupedData.forEach((_, key) => {
+            emissionTypes.forEach((type, i) => {
                 legend.append("rect")
                       .attr("x", 0)
                       .attr("y", i * 20)
                       .attr("width", 10)
                       .attr("height", 10)
-                      .style("fill", color(key));
+                      .style("fill", color(type));
 
                 legend.append("text")
                       .attr("x", 20)
                       .attr("y", i * 20 + 10)
-                      .text(key)
-                      .style("font-size", "12px")
+                      .text(type)
                       .attr("alignment-baseline", "middle");
-                i++;
             });
         });
     </script>
