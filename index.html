@@ -114,22 +114,34 @@
         height: 500px;
         margin: 0 auto;
     }
-         #scatter-plot {
-        width: 800px;
-        height: 500px;
-        margin: 0 auto;
-    }
-        #heatmap {
-            width: 900px;
-            height: 600px;
-            margin: 0 auto;
-        }
-        .cell {
-            stroke: #fff;
-        }
-        .axis text {
-            font-size: 12px;
-        }
+
+
+        .chart-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 40px 0;
+  }
+
+  .bar-chart, .pie-chart {
+      width: 45%;
+      height: 500px;
+      background-color: #f9f9f9;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+  }
+
+  .tooltip {
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+      font-size: 0.9rem;
+      pointer-events: none;
+      opacity: 0;
+  }
+        
 
     </style>
 </head>
@@ -308,157 +320,121 @@
         <div class="content-section">
             <p>Visualizing data through scatter plots provides insights into charging station distribution. </p>
         </div>
-        <div id="scatter-plot"></div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
+        
+        <div class="chart-container">
+    <!-- Container for Stacked Bar Chart -->
+    <div id="bar-chart" class="bar-chart"></div>
+
+    <!-- Container for Pie Chart -->
+    <div id="pie-chart" class="pie-chart"></div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+        <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-    // Set up chart dimensions
-    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-          width = 800 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
+  d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
+      const margin = { top: 20, right: 30, bottom: 50, left: 60 },
+            width = 500 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
 
-    // Create SVG container
-    const svg = d3.select("#scatter-plot")
-                  .append("svg")
-                  .attr("width", width + margin.left + margin.right)
-                  .attr("height", height + margin.top + margin.bottom)
-                  .append("g")
-                  .attr("transform", `translate(${margin.left},${margin.top})`);
+      const svg = d3.select("#bar-chart")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Load CSV data
-    d3.csv("Dev 1/datasets/charging_points.csv").then(data => {
-        // Parse data
-        data.forEach(d => {
-            d.year = +d.year;
-            d.value = +d.value;
-        });
+      // Grouping data by Facility Type and Fuel Type Code
+      const facilityData = d3.rollup(
+          data,
+          v => d3.rollup(
+              v, d => d.length,
+              d => d["Fuel Type Code"]
+          ),
+          d => d["Facility Type"]
+      );
 
-        // Set up scales
-        const x = d3.scaleLinear()
-                    .domain(d3.extent(data, d => d.year))
-                    .range([0, width]);
+      const keys = Array.from(new Set(data.map(d => d["Fuel Type Code"])));
+      const x = d3.scaleBand()
+                  .domain(Array.from(facilityData.keys()))
+                  .range([0, width])
+                  .padding(0.2);
 
-        const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.value)])
-                    .range([height, 0]);
+      const y = d3.scaleLinear()
+                  .domain([0, d3.max(facilityData, d => d3.sum(Array.from(d[1].values())))]).nice()
+                  .range([height, 0]);
 
-        // X and Y axis
-        svg.append("g")
-           .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-        svg.append("g")
-           .call(d3.axisLeft(y));
+      const stack = d3.stack()
+                      .keys(keys)
+                      .value((d, key) => d[1].get(key) || 0);
 
-        // Add points to scatter plot
-        svg.selectAll("circle")
-           .data(data)
-           .enter()
-           .append("circle")
-           .attr("cx", d => x(d.year))
-           .attr("cy", d => y(d.value))
-           .attr("r", 6)
-           .attr("fill", d => d.mode === "Publicly available fast" ? "#1f77b4" : "#ff7f0e")
-           .attr("opacity", 0.8);
+      svg.append("g").call(d3.axisLeft(y));
+      svg.append("g")
+         .attr("transform", `translate(0, ${height})`)
+         .call(d3.axisBottom(x));
 
-        // Add legend
-        const legend = svg.append("g")
-                          .attr("transform", `translate(${width - 150}, 20)`);
-
-        const modes = ["Publicly available fast", "Publicly available slow"];
-        const colors = ["#1f77b4", "#ff7f0e"];
-
-        modes.forEach((mode, i) => {
-            legend.append("rect")
-                  .attr("x", 0)
-                  .attr("y", i * 20)
-                  .attr("width", 10)
-                  .attr("height", 10)
-                  .style("fill", colors[i]);
-
-            legend.append("text")
-                  .attr("x", 20)
-                  .attr("y", i * 20 + 9)
-                  .text(mode)
-                  .attr("alignment-baseline", "middle");
-        });
-    });
+      svg.append("g")
+         .selectAll("g")
+         .data(stack(Array.from(facilityData.entries())))
+         .enter().append("g")
+         .attr("fill", d => color(d.key))
+         .selectAll("rect")
+         .data(d => d)
+         .enter().append("rect")
+         .attr("x", d => x(d.data[0]))
+         .attr("y", d => y(d[1]))
+         .attr("height", d => y(d[0]) - y(d[1]))
+         .attr("width", x.bandwidth());
+  });
 </script>
 
-        
-<h2>EV Charging Stations by State and Fuel Type</h2>
-    <div id="heatmap"></div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-    const margin = { top: 60, right: 30, bottom: 80, left: 100 },
-          width = 800 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
+        <script>
+  d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
+      const width = 400, height = 400, radius = Math.min(width, height) / 2;
 
-    const svg = d3.select("#heatmap")
-                  .append("svg")
-                  .attr("width", width + margin.left + margin.right)
-                  .attr("height", height + margin.top + margin.bottom)
-                  .append("g")
-                  .attr("transform", `translate(${margin.left},${margin.top})`);
+      const svg = d3.select("#pie-chart")
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .append("g")
+                    .attr("transform", `translate(${width / 2},${height / 2})`);
 
-    d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(data => {
-        const aggregatedData = d3.rollup(
-            data,
-            v => v.length, 
-            d => d.State,    
-            d => d["Fuel Type Code"] 
-        );
+      const facilityCounts = d3.rollup(
+          data,
+          v => v.length,
+          d => d["Facility Type"]
+      );
 
-        const states = Array.from(aggregatedData.keys());
-        const fuelTypes = Array.from(new Set(data.map(d => d["Fuel Type Code"])));
+      const pie = d3.pie()
+                    .value(d => d[1]);
 
-        const x = d3.scaleBand()
-                    .domain(fuelTypes)
-                    .range([0, width])
-                    .padding(0.05);
+      const arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(radius);
 
-        const y = d3.scaleBand()
-                    .domain(states)
-                    .range([0, height])
-                    .padding(0.05);
+      const color = d3.scaleOrdinal(d3.schemeSet3);
 
-        const colorScale = d3.scaleSequential()
-                             .interpolator(d3.interpolateOranges)
-                             .domain([0, d3.max(
-                                 Array.from(aggregatedData.values()).flatMap(f => Array.from(f.values()))
-                             )]);
+      svg.selectAll("path")
+         .data(pie(Array.from(facilityCounts.entries())))
+         .enter().append("path")
+         .attr("d", arc)
+         .attr("fill", d => color(d.data[0]));
 
-        svg.append("g")
-           .selectAll("rect")
-           .data(Array.from(aggregatedData.entries()).flatMap(([state, fuels]) =>
-               Array.from(fuels.entries()).map(([fuel, count]) => ({ state, fuel, count }))
-           ))
-           .enter()
-           .append("rect")
-           .attr("x", d => x(d.fuel))
-           .attr("y", d => y(d.state))
-           .attr("width", x.bandwidth())
-           .attr("height", y.bandwidth())
-           .attr("fill", d => colorScale(d.count));
+      // Tooltip for interactivity
+      const tooltip = d3.select("#tooltip");
 
-        svg.append("g")
-           .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x).tickSize(0))
-           .selectAll("text")
-           .style("text-anchor", "end")
-           .attr("dx", "-0.8em")
-           .attr("dy", "0.15em")
-           .attr("transform", "rotate(-45)");
-
-        svg.append("g")
-           .call(d3.axisLeft(y));
-
-        svg.append("text")
-           .attr("x", width / 2)
-           .attr("y", -20)
-           .attr("text-anchor", "middle")
-           .style("font-size", "16px")
-           .text("EV Charging Stations Heatmap: Fuel Type vs State");
-    });
+      svg.selectAll("path")
+         .on("mouseover", (event, d) => {
+             tooltip.style("opacity", 1)
+                    .html(`${d.data[0]}: ${d.data[1]}`)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 20) + "px");
+         })
+         .on("mouseout", () => tooltip.style("opacity", 0));
+  });
 </script>
 
         <!-- Section 4: Emissions of EVs Battery Production -->
