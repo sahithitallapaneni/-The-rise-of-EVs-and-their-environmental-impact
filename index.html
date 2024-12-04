@@ -3,80 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Power BI Reports</title>
+    <title>CO2 Emissions Report</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Make sure body takes full height and no margins/padding */
+        body, html {
+            height: 100%;
             margin: 0;
             padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Set full page background color */
+        body {
             background-color: #f4f4f4;
         }
 
-        .container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin: 30px;
-        }
-
-        .report {
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 30%;
-            margin: 10px;
+        /* Center the heading */
+        h1 {
             text-align: center;
-            box-sizing: border-box;
-        }
-
-        .report iframe {
-            width: 100%;
-            height: 300px;
-            border: none;
-        }
-
-        h2 {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: #333;
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
 
-        @media (max-width: 768px) {
-            .report {
-                width: 45%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .report {
-                width: 100%;
-            }
+        /* Make the iframe fill the entire page */
+        iframe {
+            width: 100%;
+            height: calc(100vh - 60px); /* 100% of the viewport height minus the header */
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- First Report -->
-        <div class="report">
-            <h2>Region CO2 Emissions</h2>
-            <iframe title="region-co2emissions" src="https://app.powerbi.com/view?r=eyJrIjoiMGJkZjlhOWItZjg2Ny00MGRhLTg4ODMtNTlmOWMzM2ZjZmMzIiwidCI6IjcwZGUxOTkyLTA3YzYtNDgwZi1hMzE4LWExYWZjYmEwMzk4MyIsImMiOjN9" frameborder="0" allowFullScreen="true"></iframe>
-        </div>
+    <h1>CO2 Emissions</h1>
 
-        <!-- Second Report -->
-        <div class="report">
-            <h2>Sales Growth Analysis</h2>
-            <iframe title="sales-growth" src="https://app.powerbi.com/view?r=eyJrIjoiMGJkZjlhOWItZjg2Ny00MGRhLTg4ODMtNTlmOWMzM2ZjZmMzIiwidCI6IjcwZGUxOTkyLTA3YzYtNDgwZi1hMzE4LWExYWZjYmEwMzk4MyIsImMiOjN9" frameborder="0" allowFullScreen="true"></iframe>
-        </div>
-
-        <!-- Third Report -->
-        <div class="report">
-            <h2>EV Charging Infrastructure</h2>
-            <iframe title="ev-charging" src="https://app.powerbi.com/view?r=eyJrIjoiMGJkZjlhOWItZjg2Ny00MGRhLTg4ODMtNTlmOWMzM2ZjZmMzIiwidCI6IjcwZGUxOTkyLTA3YzYtNDgwZi1hMzE4LWExYWZjYmEwMzk4MyIsImMiOjN9" frameborder="0" allowFullScreen="true"></iframe>
-        </div>
-    </div>
+    <!-- Embed Power BI Report -->
+    <iframe title="CO2 Emissions Report" src="https://app.powerbi.com/view?r=eyJrIjoiMGJkZjlhOWItZjg2Ny00MGRhLTg4ODMtNTlmOWMzM2ZjZmMzIiwidCI6IjcwZGUxOTkyLTA3YzYtNDgwZi1hMzE4LWExYWZjYmEwMzk4MyIsImMiOjN9" frameborder="0" allowFullScreen="true"></iframe>
 
 </body>
 </html>
