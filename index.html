@@ -164,7 +164,7 @@
         });
 
         // Section 4: Battery Emissions Visualization
-        d3.csv("battery_emissions.csv").then(data => {
+        d3.csv("Dev 1/datasets/battery_emissions_dataset.csv").then(data => {
             const svg = d3.select("#battery-emissions-chart").append("svg")
                           .attr("width", 600)
                           .attr("height", 400);
