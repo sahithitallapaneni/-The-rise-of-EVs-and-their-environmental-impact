@@ -157,6 +157,35 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
+        /* Make the main container a flexbox container */
+.container {
+    display: flex;
+    flex-wrap: wrap;  /* Allows charts to wrap on smaller screens */
+    justify-content: space-around; /* Space the charts evenly */
+    margin: 20px;
+}
+
+/* Chart container style */
+.chart-container {
+    margin: 20px;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for bar chart container */
+#bar-chart-container {
+    width: 45%;
+    height: 400px;  /* Adjust height */
+}
+
+/* Style for pie chart container */
+#pie-chart-container {
+    width: 45%;
+    height: 400px;  /* Adjust height */
+}
+
     </style>
 </head>
 <body>
@@ -341,8 +370,8 @@
         <p>Visualizing data through pie charts and stacked bar charts provides insights into the distribution of charging stations by facility and fuel types.</p>
     </div>
 
-    <!-- Stacked Bar Chart Container -->
-    <div id="stacked-bar-chart" class="content-section"></div>
+    <div id="bar-chart-container" class="chart-container"></div>
+    <div id="pie-chart-container" class="chart-container"></div>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
