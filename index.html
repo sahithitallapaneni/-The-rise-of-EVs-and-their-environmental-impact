@@ -119,6 +119,17 @@
         height: 500px;
         margin: 0 auto;
     }
+        #heatmap {
+            width: 900px;
+            height: 600px;
+            margin: 0 auto;
+        }
+        .cell {
+            stroke: #fff;
+        }
+        .axis text {
+            font-size: 12px;
+        }
 
     </style>
 </head>
@@ -373,7 +384,82 @@
     });
 </script>
 
+        
+<h2>EV Charging Stations by State and Fuel Type</h2>
+    <div id="heatmap"></div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    const margin = { top: 60, right: 30, bottom: 80, left: 100 },
+          width = 800 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
 
+    const svg = d3.select("#heatmap")
+                  .append("svg")
+                  .attr("width", width + margin.left + margin.right)
+                  .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(data => {
+        const aggregatedData = d3.rollup(
+            data,
+            v => v.length, 
+            d => d.State,    
+            d => d["Fuel Type Code"] 
+        );
+
+        const states = Array.from(aggregatedData.keys());
+        const fuelTypes = Array.from(new Set(data.map(d => d["Fuel Type Code"])));
+
+        const x = d3.scaleBand()
+                    .domain(fuelTypes)
+                    .range([0, width])
+                    .padding(0.05);
+
+        const y = d3.scaleBand()
+                    .domain(states)
+                    .range([0, height])
+                    .padding(0.05);
+
+        const colorScale = d3.scaleSequential()
+                             .interpolator(d3.interpolateOranges)
+                             .domain([0, d3.max(
+                                 Array.from(aggregatedData.values()).flatMap(f => Array.from(f.values()))
+                             )]);
+
+        svg.append("g")
+           .selectAll("rect")
+           .data(Array.from(aggregatedData.entries()).flatMap(([state, fuels]) =>
+               Array.from(fuels.entries()).map(([fuel, count]) => ({ state, fuel, count }))
+           ))
+           .enter()
+           .append("rect")
+           .attr("x", d => x(d.fuel))
+           .attr("y", d => y(d.state))
+           .attr("width", x.bandwidth())
+           .attr("height", y.bandwidth())
+           .attr("fill", d => colorScale(d.count));
+
+        svg.append("g")
+           .attr("transform", `translate(0,${height})`)
+           .call(d3.axisBottom(x).tickSize(0))
+           .selectAll("text")
+           .style("text-anchor", "end")
+           .attr("dx", "-0.8em")
+           .attr("dy", "0.15em")
+           .attr("transform", "rotate(-45)");
+
+        svg.append("g")
+           .call(d3.axisLeft(y));
+
+        svg.append("text")
+           .attr("x", width / 2)
+           .attr("y", -20)
+           .attr("text-anchor", "middle")
+           .style("font-size", "16px")
+           .text("EV Charging Stations Heatmap: Fuel Type vs State");
+    });
+</script>
 
         <!-- Section 4: Emissions of EVs Battery Production -->
         <div class="section-title">Emissions of Battery Production</div>
