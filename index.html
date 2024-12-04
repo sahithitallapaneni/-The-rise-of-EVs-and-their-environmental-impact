@@ -315,23 +315,16 @@
 </script>
 
 
-        <!-- Section 3: Heat Map and Scatter Plot -->
-        <div class="section-title"> Scatter Plot</div>
+        <!-- Section 3: stacked bar chart and Pie chart -->
+        <div class="section-title"> Stacked bar chart & Pie chart</div>
         <div class="content-section">
-            <p>Visualizing data through scatter plots provides insights into charging station distribution. </p>
+            <p>Visualizing data through pie charts and stacked bar chart provides insights into charging station distribution. </p>
         </div>
         
         <div class="chart-container">
     <!-- Container for Stacked Bar Chart -->
     <div id="bar-chart" class="bar-chart"></div>
-
-    <!-- Container for Pie Chart -->
-    <div id="pie-chart" class="pie-chart"></div>
-</div>
-
-<div class="tooltip" id="tooltip"></div>
-
-        <script src="https://d3js.org/d3.v7.min.js"></script>
+            <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
   d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
       const margin = { top: 20, right: 30, bottom: 50, left: 60 },
@@ -390,6 +383,14 @@
          .attr("width", x.bandwidth());
   });
 </script>
+
+    <!-- Container for Pie Chart -->
+    <div id="pie-chart" class="pie-chart"></div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+        
 
         <script>
   d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
