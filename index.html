@@ -5,36 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rise of EVs & Environmental Impact</title>
     <style>
-       .button-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .button {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            text-align: center;
-            font-size: 2rem;
-            color: white;
-            background-color: #007BFF;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        .button:active {
-            background-color: #003d7a;
-        }
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-        }
+    
 
         
         /* Base Styles */
@@ -149,14 +120,8 @@
       margin: 40px 0;
   }
 
-   .pie-chart {
-      width: 45%;
-      height: 500px;
-      background-color: #f9f9f9;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-  }
+
+  
 
   .tooltip {
       position: absolute;
@@ -221,12 +186,18 @@
     transition: opacity 0.3s;
   }
        
+/* Button container */
 .button-container {
-    position: relative;
-    width: 80%;
-    height: 80%;
+    position: fixed;  /* Fixed position to keep buttons in place */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centering the buttons */
+    z-index: 10;  /* Ensure buttons are on top of other content */
+    width: 100%;
+    height: 100%;
 }
 
+/* Styling for the buttons */
 .tile-button {
     position: absolute;
     display: flex;
@@ -270,6 +241,11 @@
     top: 50%;
     left: 0;
     transform: translateY(-50%);
+}
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
     </style>
 </head>
