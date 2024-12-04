@@ -1,4 +1,136 @@
-<!-- Section 4: Emissions of Battery Production -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rise of EVs & Environmental Impact</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Huge Main Heading */
+        header {
+            color: black;
+            text-align: center;
+            padding: 80px 20px;
+        }
+        h1:hover {
+            transform: scale(1.2);  /* Makes the heading grow */
+            color: #f1c40f;         /* Changes color to gold */
+        }
+
+        header h1 {
+            font-size: 4rem;
+            margin: 0;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Side Headings */
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 60px 0 20px;
+            color: #2c3e50;
+            transition: transform 0.3s ease;
+        }
+
+        .section-title:hover {
+            transform: scale(1.1);
+            color: #e74c3c;
+        }
+
+        /* Section Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .content-section {
+            margin-bottom: 60px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .content-section p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* Footer */
+        footer {
+            background: #34495e;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 3rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Header -->
+    <header>
+        <h1>Rise of EVs & Their Environmental Impact</h1>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Section 1: Rise of EV -->
+        <div class="section-title">Rise of EV</div>
+        <div class="content-section">
+            <p>The rise of Electric Vehicles (EVs) marks a transformative era in transportation. With advancements in battery technology and global initiatives to reduce carbon emissions, EVs are rapidly gaining traction worldwide.</p>
+        </div>
+
+        <!-- Section 2: Environmental Impact -->
+        <div class="section-title">Environmental Impact</div>
+        <div class="content-section">
+            <p>EVs significantly reduce greenhouse gas emissions compared to traditional vehicles. However, understanding their full environmental impact requires considering electricity sources and battery production emissions.</p>
+        </div>
+
+        <!-- Section 3: Heat Map and Scatter Plot -->
+        <div class="section-title">Heat Map and Scatter Plot</div>
+        <div class="content-section">
+            <p>Visualizing data through heat maps and scatter plots provides insights into EV adoption trends and charging station distribution across different regions.</p>
+        </div>
+
+        <!-- Section 4: Emissions of Battery Production -->
 <div class="section-title">Emissions of Battery Production</div>
 <div class="content-section">
     <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
@@ -51,3 +183,8 @@
          .attr("height", d => height - y(+d['Total Emissions']));
     });
 </script>
+
+  
+
+</body>
+</html>
