@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CO2 Emissions Report</title>
+
+    <style>
+        /* Make sure body takes full height and no margins/padding */
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Set full page background color */
+        body {
+            background-color: #f4f4f4;
+        }
+
+        /* Center the heading */
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        /* Make the iframe fill the entire page */
+        iframe {
+            width: 100%;
+            height: calc(100vh - 60px); /* 100% of the viewport height minus the header */
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>CO2 emmisions and EV sales line chart</h1>
+
+    <!-- Embed Power BI Report -->
+    <iframe title="merged" width="600" height="373.5" src="https://app.powerbi.com/view?r=eyJrIjoiYWI0NDQ3YzktNWVlYi00ZjI5LWEzOWEtMGZmOWMxMDAwODA4IiwidCI6IjcwZGUxOTkyLTA3YzYtNDgwZi1hMzE4LWExYWZjYmEwMzk4MyIsImMiOjN9" frameborder="0" allowFullScreen="true"></iframe>
+</body>
+</html>
