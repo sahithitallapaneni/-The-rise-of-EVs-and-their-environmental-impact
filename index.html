@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rise of EVs & Environmental Impact</title>
     <style>
+        #container {
+            text-align: center;
+        }
+        select {
+            font-size: 18px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        svg {
+            width: 80%;
+            height: 400px;
+            margin: auto;
+        }
+        .bar {
+            fill: #3498db;
+        }
+        .axis-label {
+            font-size: 14px;
+        }
+
+
+
+
+
+        
     
 
         
@@ -200,6 +225,111 @@
 
     <!-- Main Container -->
     <div class="container">
+
+
+<div id="container">
+        <h1>Impact of Electric Vehicles (EVs) on the Environment</h1>
+        <label for="filter">Choose a filter to see the impact:</label>
+        <select id="filter">
+            <option value="ev_sales">EV Sales Growth</option>
+            <option value="co2_emissions">CO₂ Emissions Reduction</option>
+            <option value="charging_stations">EV Charging Stations</option>
+        </select>
+        
+        <div id="chart"></div>
+    </div>
+
+    <script>
+        
+        let evSalesData, co2EmissionsData, chargingStationsData;
+        
+      
+        Promise.all([
+            d3.csv('Dev 1/datasets/EV salesHistoricalCars.csv'),
+            d3.csv('Dev 1/datasets/co2emissions.csv'),
+            d3.csv('Dev 1/datasets/EV charging pointsHistoricalEV.csv')
+        ]).then(function([evSales, co2Emissions, chargingStations]) {
+            evSalesData = evSales;
+            co2EmissionsData = co2Emissions;
+            chargingStationsData = chargingStations;
+
+            // Initialize chart with EV sales data by default
+            drawChart(evSalesData);
+        });
+
+        // Function to draw chart based on the selected filter
+        function drawChart(data) {
+            // Clear previous chart
+            d3.select('#chart').html('');
+
+            // Set up chart dimensions
+            const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+                  width = 800 - margin.left - margin.right,
+                  height = 400 - margin.top - margin.bottom;
+
+            const svg = d3.select("#chart")
+                          .append("svg")
+                          .attr("width", width + margin.left + margin.right)
+                          .attr("height", height + margin.top + margin.bottom)
+                          .append("g")
+                          .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Set up X and Y scales
+            const x = d3.scaleBand()
+                        .domain(data.map(d => d.year))  // X-axis based on years
+                        .range([0, width])
+                        .padding(0.1);
+
+            const y = d3.scaleLinear()
+                        .domain([0, d3.max(data, d => +d.value)])  // Y-axis based on values
+                        .range([height, 0]);
+
+            // Append X and Y axes
+            svg.append("g")
+               .attr("transform", `translate(0,${height})`)
+               .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+            svg.append("g")
+               .call(d3.axisLeft(y).ticks(5));
+
+            // Create bars for the chart
+            svg.selectAll(".bar")
+               .data(data)
+               .enter()
+               .append("rect")
+               .attr("class", "bar")
+               .attr("x", d => x(d.year))
+               .attr("y", d => y(d.value))
+               .attr("width", x.bandwidth())
+               .attr("height", d => height - y(d.value));
+
+            // Add chart title
+            svg.append("text")
+               .attr("x", width / 2)
+               .attr("y", -20)
+               .attr("text-anchor", "middle")
+               .style("font-size", "20px")
+               .text("Impact of EVs on the Environment");
+        }
+
+        // Event listener for filter dropdown change
+        document.getElementById('filter').addEventListener('change', function(event) {
+            const filterValue = event.target.value;
+
+            // Based on the selected filter, choose the appropriate data to display
+            if (filterValue === 'ev_sales') {
+                drawChart(evSalesData);
+            } else if (filterValue === 'co2_emissions') {
+                drawChart(co2EmissionsData);
+            } else if (filterValue === 'charging_stations') {
+                drawChart(chargingStationsData);
+            }
+        });
+    </script>
+
+
+
+        
         <!-- Section 1: Rise of EV -->
         <div class="section-title">Rise of EV</div>
         <div class="content-section">
