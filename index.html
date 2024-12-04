@@ -241,8 +241,7 @@
 
         <!-- Line Chart for EV Sales -->
         <div id="bar-chart"></div>  <!-- This is the container for the line chart -->
-
-       <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
     // Load the CSV data for EV sales
     d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(data) {
@@ -292,7 +291,16 @@
            .attr("y", d => y(d.value))
            .attr("width", x.bandwidth())
            .attr("height", d => height - y(d.value))
-           .attr("fill", "orange");
+           .attr("fill", "orange")
+           .on("mouseover", function(event, d) { // Tooltip on hover
+               tooltip.style("opacity", 1);
+               tooltip.html(`Year: ${d.year}<br>Sales: ${d.value}`)
+                      .style("left", (event.pageX + 5) + "px")
+                      .style("top", (event.pageY - 28) + "px");
+           })
+           .on("mouseout", function() {
+               tooltip.style("opacity", 0);
+           });
 
         // Add chart title
         svg.append("text")
@@ -302,8 +310,19 @@
            .style("font-size", "20px")
            .text("EV Sales Growth Over Time");
 
+        // Tooltip div
+        const tooltip = d3.select("body")
+                          .append("div")
+                          .attr("class", "tooltip")
+                          .style("position", "absolute")
+                          .style("opacity", 0)
+                          .style("background-color", "rgba(0, 0, 0, 0.7)")
+                          .style("color", "#fff")
+                          .style("padding", "5px")
+                          .style("border-radius", "5px");
     });
 </script>
+
 
 
 
