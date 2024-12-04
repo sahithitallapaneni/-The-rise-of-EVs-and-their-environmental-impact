@@ -314,7 +314,7 @@
                   .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Load CSV data
-    d3.csv("charging_points.csv").then(data => {
+    d3.csv("Dev 1/datasets/charging_points.csv").then(data => {
         // Parse data
         data.forEach(d => {
             d.year = +d.year;
