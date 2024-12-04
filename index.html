@@ -101,6 +101,13 @@
                 font-size: 2rem;
             }
         }
+
+        /* Line Chart Container */
+        #line-chart {
+            width: 100%;
+            height: 600px;
+            margin: 40px 0;
+        }
     </style>
 </head>
 <body>
@@ -117,91 +124,94 @@
         <div class="content-section">
             <p>The rise of Electric Vehicles (EVs) marks a transformative era in transportation. With advancements in battery technology and global initiatives to reduce carbon emissions, EVs are rapidly gaining traction worldwide.</p>
         </div>
+
+        <!-- Line Chart for EV Sales -->
+        <div id="line-chart"></div>  <!-- This is the container for the line chart -->
+
         <script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-    // Load the CSV data for EV sales
-    d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(data) {
-        // Parse the data
-        data.forEach(d => {
-            d.year = +d.year;
-            d.value = +d.value;
-        });
+        <script>
+            // Load the CSV data for EV sales
+            d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(data) {
+                // Parse the data
+                data.forEach(d => {
+                    d.year = +d.year;
+                    d.value = +d.value;
+                });
 
-        // Set up chart dimensions
-        const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-              width = 800 - margin.left - margin.right,
-              height = 600 - margin.top - margin.bottom;
+                // Set up chart dimensions
+                const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+                      width = 800 - margin.left - margin.right,
+                      height = 600 - margin.top - margin.bottom;
 
-        const svg = d3.select("#line-chart")
-                      .append("svg")
-                      .attr("width", width + margin.left + margin.right)
-                      .attr("height", height + margin.top + margin.bottom)
-                      .append("g")
-                      .attr("transform", `translate(${margin.left},${margin.top})`);
+                const svg = d3.select("#line-chart")
+                            .append("svg")
+                            .attr("width", width + margin.left + margin.right)
+                            .attr("height", height + margin.top + margin.bottom)
+                            .append("g")
+                            .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        // Group data by region and powertrain
-        const regions = Array.from(new Set(data.map(d => d.region)));
-        const powertrains = Array.from(new Set(data.map(d => d.powertrain)));
+                // Group data by region and powertrain
+                const regions = Array.from(new Set(data.map(d => d.region)));
+                const powertrains = Array.from(new Set(data.map(d => d.powertrain)));
 
-        const color = d3.scaleOrdinal(d3.schemeCategory10);
+                const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-        // X and Y scales
-        const x = d3.scaleLinear()
-                    .domain([d3.min(data, d => d.year), d3.max(data, d => d.year)])
-                    .range([0, width]);
+                // X and Y scales
+                const x = d3.scaleLinear()
+                            .domain([d3.min(data, d => d.year), d3.max(data, d => d.year)])
+                            .range([0, width]);
 
-        const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.value)])
-                    .range([height, 0]);
+                const y = d3.scaleLinear()
+                            .domain([0, d3.max(data, d => d.value)])
+                            .range([height, 0]);
 
-        // X and Y axes
-        svg.append("g")
-           .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x));
+                // X and Y axes
+                svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x));
 
-        svg.append("g")
-           .call(d3.axisLeft(y));
+                svg.append("g")
+                .call(d3.axisLeft(y));
 
-        // Prepare the data for each region and powertrain
-        const line = d3.line()
-                       .x(d => x(d.year))
-                       .y(d => y(d.value));
+                // Prepare the data for each region and powertrain
+                const line = d3.line()
+                               .x(d => x(d.year))
+                               .y(d => y(d.value));
 
-        // Draw lines for each region and powertrain
-        powertrains.forEach(powertrain => {
-            regions.forEach(region => {
-                const regionData = data.filter(d => d.region === region && d.powertrain === powertrain);
-                svg.append("path")
-                   .data([regionData])
-                   .attr("class", "line")
-                   .attr("d", line)
-                   .attr("fill", "none")
-                   .attr("stroke", color(powertrain))
-                   .attr("stroke-width", 2);
+                // Draw lines for each region and powertrain
+                powertrains.forEach(powertrain => {
+                    regions.forEach(region => {
+                        const regionData = data.filter(d => d.region === region && d.powertrain === powertrain);
+                        svg.append("path")
+                           .data([regionData])
+                           .attr("class", "line")
+                           .attr("d", line)
+                           .attr("fill", "none")
+                           .attr("stroke", color(powertrain))
+                           .attr("stroke-width", 2);
+                    });
+                });
+
+                // Add legends for the powertrains
+                const legend = svg.append("g")
+                                  .attr("transform", `translate(${width - 150}, 20)`);
+
+                powertrains.forEach((powertrain, i) => {
+                    legend.append("rect")
+                          .attr("x", 0)
+                          .attr("y", i * 20)
+                          .attr("width", 10)
+                          .attr("height", 10)
+                          .style("fill", color(powertrain));
+
+                    legend.append("text")
+                          .attr("x", 20)
+                          .attr("y", i * 20 + 10)
+                          .text(powertrain)
+                          .attr("alignment-baseline", "middle");
+                });
             });
-        });
-
-        // Add legends for the powertrains
-        const legend = svg.append("g")
-                          .attr("transform", `translate(${width - 150}, 20)`);
-
-        powertrains.forEach((powertrain, i) => {
-            legend.append("rect")
-                  .attr("x", 0)
-                  .attr("y", i * 20)
-                  .attr("width", 10)
-                  .attr("height", 10)
-                  .style("fill", color(powertrain));
-
-            legend.append("text")
-                  .attr("x", 20)
-                  .attr("y", i * 20 + 10)
-                  .text(powertrain)
-                  .attr("alignment-baseline", "middle");
-        });
-    });
-</script>
-
+        </script>
 
         <!-- Section 2: Environmental Impact -->
         <div class="section-title">Environmental Impact</div>
@@ -225,101 +235,6 @@
         <div id="stacked-bar-chart" class="content-section"></div>
 
     </div>
-
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script>
-        // Load the CSV data
-        d3.csv("Dev 1/datasets/battery_emissions_dataset.csv").then(function(data) {
-            const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-                  width = 800 - margin.left - margin.right,
-                  height = 600 - margin.top - margin.bottom;
-
-            const svg = d3.select("#stacked-bar-chart")
-                          .append("svg")
-                          .attr("width", width + margin.left + margin.right)
-                          .attr("height", height + margin.top + margin.bottom)
-                          .append("g")
-                          .attr("transform", `translate(${margin.left},${margin.top})`);
-
-            const emissionTypes = ["Mining Emissions (kg CO2e)", "Processing Emissions (kg CO2e)"];
-            const countries = Array.from(new Set(data.map(d => d.Country)));
-
-            data.forEach(d => {
-                d["Mining Emissions (kg CO2e)"] = +d["Mining Emissions (kg CO2e)"];
-                d["Processing Emissions (kg CO2e)"] = +d["Processing Emissions (kg CO2e)"];
-            });
-
-            const emissionsByCountry = d3.rollup(
-                data,
-                v => ({
-                    "Mining Emissions (kg CO2e)": d3.sum(v, d => d["Mining Emissions (kg CO2e)"]),
-                    "Processing Emissions (kg CO2e)": d3.sum(v, d => d["Processing Emissions (kg CO2e)"])
-                }),
-                d => d.Country
-            );
-
-            const formattedData = Array.from(emissionsByCountry, ([key, values]) => ({
-                Country: key,
-                ...values
-            }));
-
-            const stack = d3.stack().keys(emissionTypes);
-            const stackedData = stack(formattedData);
-
-            const x = d3.scaleBand()
-                        .domain(countries)
-                        .range([0, width])
-                        .padding(0.2);
-
-            const y = d3.scaleLinear()
-                        .domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])])
-                        .range([height, 0]);
-
-            svg.append("g")
-               .attr("transform", `translate(0,${height})`)
-               .call(d3.axisBottom(x));
-
-            svg.append("g")
-               .call(d3.axisLeft(y));
-
-            const color = d3.scaleOrdinal()
-                            .domain(emissionTypes)
-                            .range(["#1f77b4", "#ff7f0e"]);
-
-            svg.selectAll("g.layer")
-               .data(stackedData)
-               .enter()
-               .append("g")
-               .attr("class", "layer")
-               .attr("fill", d => color(d.key))
-               .selectAll("rect")
-               .data(d => d)
-               .enter()
-               .append("rect")
-               .attr("x", d => x(d.data.Country))
-               .attr("y", d => y(d[1]))
-               .attr("height", d => y(d[0]) - y(d[1]))
-               .attr("width", x.bandwidth());
-
-            const legend = svg.append("g")
-                              .attr("transform", `translate(${width - 150},20)`);
-
-            emissionTypes.forEach((type, i) => {
-                legend.append("rect")
-                      .attr("x", 0)
-                      .attr("y", i * 20)
-                      .attr("width", 10)
-                      .attr("height", 10)
-                      .style("fill", color(type));
-
-                legend.append("text")
-                      .attr("x", 20)
-                      .attr("y", i * 20 + 10)
-                      .text(type)
-                      .attr("alignment-baseline", "middle");
-            });
-        });
-    </script>
 
     <footer>
         <p>Conclusion: Environmental Cost of Battery Production should also be taken into consideration.</p>
