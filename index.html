@@ -137,7 +137,57 @@
   
   }
          
-        
+         .chart-container {
+    width: 800px;
+    height: 500px;
+    margin: 20px auto;
+    position: relative;
+  }
+
+  .bar {
+    stroke-width: 1;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    shape-rendering: crispEdges;
+  }
+
+  .x-axis path {
+    display: none;
+  }
+
+  .x-label,
+  .y-label {
+    font-size: 14px;
+    font-weight: bold;
+    fill: #333;
+  }
+
+  .legend {
+    font-size: 12px;
+    font-weight: bold;
+    text-anchor: start;
+  }
+
+  .legend-rect {
+    width: 18px;
+    height: 18px;
+    stroke-width: 0.5px;
+  }
+
+  .tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 12px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
 
     </style>
 </head>
@@ -317,117 +367,108 @@
             <p>Visualizing data through pie charts and stacked bar chart provides insights into charging station distribution. </p>
         </div>
         
-        <div id="pie-chart" class="pie-chart"></div>
-        <script>
-  d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
-      const width = 400,
-            height = 400,
-            radius = Math.min(width, height) / 2;
+ <script>
+        // Load the CSV data from a local file
+        d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
+            // Parse the data to group by Facility Type and Fuel Type Code
+            const fuelTypes = Array.from(new Set(data.map(d => d['Fuel Type Code'])));
+            const facilities = Array.from(new Set(data.map(d => d['Facility Type'])));
 
-      const svg = d3.select("#pie-chart")
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .append("g")
-                    .attr("transform", `translate(${width / 2},${height / 2})`);
+            // Aggregate data by Facility Type and Fuel Type
+            const groupedData = d3.rollup(
+                data,
+                v => fuelTypes.map(ft => ({
+                    type: ft,
+                    value: d3.sum(v.filter(d => d['Fuel Type Code'] === ft), d => 1)
+                })),
+                d => d['Facility Type']
+            );
 
-      // Aggregate data by Country
-      const countryCounts = d3.rollup(
-          data,
-          v => v.length,
-          d => d["Country"]
-      );
+            const formattedData = Array.from(groupedData, ([facility, values]) => ({
+                facility: facility,
+                ...Object.fromEntries(values.map(v => [v.type, v.value]))
+            }));
 
-      const pie = d3.pie()
-                    .value(d => d[1]);
+            // Setup dimensions
+            const margin = { top: 40, right: 30, bottom: 60, left: 60 };
+            const width = 800 - margin.left - margin.right;
+            const height = 500 - margin.top - margin.bottom;
 
-      const arc = d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(radius);
+            const svg = d3.select("#stacked-bar-chart")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      const color = d3.scaleOrdinal(d3.schemeCategory10);
+            // Set up scales
+            const x = d3.scaleBand()
+                .domain(formattedData.map(d => d.facility))
+                .range([0, width])
+                .padding(0.2);
 
-      const pieData = Array.from(countryCounts.entries());
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(formattedData, d => d3.sum(fuelTypes, ft => d[ft] || 0))])
+                .range([height, 0]);
 
-      const arcs = svg.selectAll("arc")
-                      .data(pie(pieData))
-                      .enter()
-                      .append("g");
+            const color = d3.scaleOrdinal()
+                .domain(fuelTypes)
+                .range(d3.schemeCategory10);
 
-      // Draw pie slices
-      arcs.append("path")
-          .attr("d", arc)
-          .attr("fill", d => color(d.data[0]));
+            // X Axis
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .attr("transform", "rotate(-45)")
+                .style("text-anchor", "end");
 
-      // Add labels
-      arcs.append("text")
-          .attr("transform", d => `translate(${arc.centroid(d)})`)
-          .attr("dy", "0.35em")
-          .attr("class", "label")
-          .text(d => `${d.data[0]} (${d.data[1]})`);
-  });
-</script>
+            // Y Axis
+            svg.append("g")
+                .call(d3.axisLeft(y));
 
-    <div id="bar-chart" class="bar-chart"></div>
-            <script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-  d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
-      const margin = { top: 20, right: 30, bottom: 50, left: 60 },
-            width = 500 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
+            // Stack data
+            const stackedData = d3.stack()
+                .keys(fuelTypes)
+                .value((d, key) => d[key] || 0)(formattedData);
 
-      const svg = d3.select("#bar-chart")
-                    .append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", `translate(${margin.left},${margin.top})`);
+            // Draw bars
+            svg.selectAll("g.layer")
+                .data(stackedData)
+                .enter()
+                .append("g")
+                .attr("class", "layer")
+                .attr("fill", d => color(d.key))
+                .selectAll("rect")
+                .data(d => d)
+                .enter()
+                .append("rect")
+                .attr("x", d => x(d.data.facility))
+                .attr("y", d => y(d[1]))
+                .attr("height", d => y(d[0]) - y(d[1]))
+                .attr("width", x.bandwidth());
 
-      // Grouping data by Facility Type and Fuel Type Code
-      const facilityData = d3.rollup(
-          data,
-          v => d3.rollup(
-              v, d => d.length,
-              d => d["Fuel Type Code"]
-          ),
-          d => d["Facility Type"]
-      );
+            // Add legend
+            const legend = svg.append("g")
+                .attr("transform", `translate(${width - 100},${20})`);
 
-      const keys = Array.from(new Set(data.map(d => d["Fuel Type Code"])));
-      const x = d3.scaleBand()
-                  .domain(Array.from(facilityData.keys()))
-                  .range([0, width])
-                  .padding(0.2);
+            fuelTypes.forEach((ft, i) => {
+                legend.append("rect")
+                    .attr("x", 0)
+                    .attr("y", i * 20)
+                    .attr("width", 18)
+                    .attr("height", 18)
+                    .attr("fill", color(ft));
 
-      const y = d3.scaleLinear()
-                  .domain([0, d3.max(facilityData, d => d3.sum(Array.from(d[1].values())))]).nice()
-                  .range([height, 0]);
+                legend.append("text")
+                    .attr("x", 24)
+                    .attr("y", i * 20 + 14)
+                    .text(ft);
+            });
+        });
+    </script>
 
-      const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-      const stack = d3.stack()
-                      .keys(keys)
-                      .value((d, key) => d[1].get(key) || 0);
-
-      svg.append("g").call(d3.axisLeft(y));
-      svg.append("g")
-         .attr("transform", `translate(0, ${height})`)
-         .call(d3.axisBottom(x));
-
-      svg.append("g")
-         .selectAll("g")
-         .data(stack(Array.from(facilityData.entries())))
-         .enter().append("g")
-         .attr("fill", d => color(d.key))
-         .selectAll("rect")
-         .data(d => d)
-         .enter().append("rect")
-         .attr("x", d => x(d.data[0]))
-         .attr("y", d => y(d[1]))
-         .attr("height", d => y(d[0]) - y(d[1]))
-         .attr("width", x.bandwidth());
-  });
-</script>
+        
 
     <!-- Container for Pie Chart -->
     <div id="pie-chart" class="pie-chart"></div>
