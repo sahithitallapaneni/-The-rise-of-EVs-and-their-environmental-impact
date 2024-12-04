@@ -221,7 +221,56 @@
     transition: opacity 0.3s;
   }
        
+.button-container {
+    position: relative;
+    width: 80%;
+    height: 80%;
+}
 
+.tile-button {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+    background-color: #3498db;
+    color: white;
+    font-size: 24px;
+    text-decoration: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.tile-button:hover {
+    transform: scale(1.1);
+    background-color: #2980b9;
+}
+
+.top {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.right {
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+}
+
+.bottom {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.left {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}
     </style>
 </head>
 <body>
@@ -442,124 +491,18 @@
 
 
         <!-- Section 3: Pie chart -->
-        <div class="section-title"> Scatter plot of charging stations distribution</div>
+        <div class="section-title"> Do we need to consider anything else to come to a conclusion?</div>
         <div class="content-section">
             <p>Visualizing data through scatter plots and stacked bar chart provides insights into charging station distribution. </p>
         </div>
-        
-<div id="1bar-chart"></div>
+        <div class="button-container">
+        <a href="page1.html" class="tile-button top">Page 1</a>
+        <a href="page2.html" class="tile-button right">Page 2</a>
+        <a href="page3.html" class="tile-button bottom">Page 3</a>
+        <a href="page4.html" class="tile-button left">Page 4</a>
+    </div>
 
-        
-<script src="https://d3js.org/d3.v7.min.js"></script>
-
-<script>
-    // Set up chart dimensions
-    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-          width = 800 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
-
-    // Create SVG container
-    const svg = d3.select("#1bar-chart")
-                  .append("svg")
-                  .attr("width", width + margin.left + margin.right)
-                  .attr("height", height + margin.top + margin.bottom)
-                  .append("g")
-                  .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // Tooltip div
-    const tooltip = d3.select("body")
-                      .append("div")
-                      .attr("class", "tooltip")
-                      .style("position", "absolute")
-                      .style("opacity", 0)
-                      .style("background-color", "rgba(0, 0, 0, 0.7)")
-                      .style("color", "#fff")
-                      .style("padding", "5px")
-                      .style("border-radius", "5px");
-
-    // Load the CSV dataset
-    d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
-        // Parse the data
-        data.forEach(d => {
-            d['Fuel Type Code'] = d['Fuel Type Code'];
-        });
-
-        // Count the number of stations for each fuel type
-        const fuelTypeCount = d3.nest()
-            .key(d => d['Fuel Type Code'])
-            .rollup(v => v.length)
-            .entries(data);
-
-        // Set up X and Y scales
-        const x = d3.scaleBand()
-                    .domain(fuelTypeCount.map(d => d.key))
-                    .range([0, width])
-                    .padding(0.1);
-
-        const y = d3.scaleLinear()
-                    .domain([0, d3.max(fuelTypeCount, d => d.value)])
-                    .range([height, 0]);
-
-        // Add X axis
-        svg.append("g")
-           .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x));
-
-        // Add Y axis
-        svg.append("g")
-           .call(d3.axisLeft(y));
-
-        // Create bars for the bar chart
-        svg.selectAll(".bar")
-           .data(fuelTypeCount)
-           .enter()
-           .append("rect")
-           .attr("class", "bar")
-           .attr("x", d => x(d.key))
-           .attr("y", d => y(d.value))
-           .attr("width", x.bandwidth())
-           .attr("height", d => height - y(d.value))
-           .attr("fill", "#3498db")
-           .on("mouseover", function(event, d) {
-               tooltip.style("opacity", 1);
-               tooltip.html(`Fuel Type: ${d.key}<br>Number of Stations: ${d.value}`)
-                      .style("left", (event.pageX + 5) + "px")
-                      .style("top", (event.pageY - 28) + "px");
-           })
-           .on("mouseout", function() {
-               tooltip.style("opacity", 0);
-           });
-
-        // Add chart title
-        svg.append("text")
-           .attr("x", width / 2)
-           .attr("y", -20)
-           .attr("text-anchor", "middle")
-           .style("font-size", "20px")
-           .text("Fuel Stations by Fuel Type");
-
-        // Add X-axis label
-        svg.append("text")
-           .attr("x", width / 2)
-           .attr("y", height + margin.bottom - 10)
-           .attr("text-anchor", "middle")
-           .style("font-size", "14px")
-           .text("Fuel Type");
-
-        // Add Y-axis label
-        svg.append("text")
-           .attr("transform", "rotate(-90)")
-           .attr("x", -height / 2)
-           .attr("y", -40)
-           .attr("text-anchor", "middle")
-           .style("font-size", "14px")
-           .text("Number of Stations");
-    });
-</script>
-
-
-
-        
+   
 
         <!-- Section 4: Emissions of EVs Battery Production -->
         <div class="section-title">Emissions of Battery Production</div>
