@@ -333,10 +333,10 @@
         </div>
         <div id="line-chart"></div>
 
-        <script src="https://d3js.org/d3.v7.min.js"></script>
+       <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
     // Set up the chart dimensions
-    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+    const margin = { top: 50, right: 100, bottom: 50, left: 60 },
           width = 800 - margin.left - margin.right,
           height = 500 - margin.top - margin.bottom;
 
@@ -362,7 +362,7 @@
                     .range([0, width]);
 
         const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d["Total CO2 Emissions Reduction (kg)"])])
+                    .domain([0, d3.max(data, d => d["Total CO2 Emissions Reduction (kg)"])] )
                     .range([height, 0]);
 
         // Add X axis
@@ -383,19 +383,45 @@
         const regions = Array.from(new Set(data.map(d => d.Region)));
         const color = d3.scaleOrdinal(d3.schemeCategory10).domain(regions);
 
+        // Tooltip div
+        const tooltip = d3.select("body")
+                          .append("div")
+                          .attr("class", "tooltip")
+                          .style("position", "absolute")
+                          .style("opacity", 0)
+                          .style("background-color", "rgba(0, 0, 0, 0.7)")
+                          .style("color", "#fff")
+                          .style("padding", "5px")
+                          .style("border-radius", "5px");
+
         regions.forEach(region => {
             const regionData = data.filter(d => d.Region === region);
-            svg.append("path")
-               .datum(regionData)
-               .attr("fill", "none")
-               .attr("stroke", color(region))
-               .attr("stroke-width", 2)
-               .attr("d", line);
+            const path = svg.append("path")
+                            .datum(regionData)
+                            .attr("fill", "none")
+                            .attr("stroke", color(region))
+                            .attr("stroke-width", 2)
+                            .attr("d", line);
+
+            // Add tooltip functionality to the lines
+            path.on("mouseover", function(event, d) {
+                    tooltip.style("opacity", 1);
+                })
+                .on("mousemove", function(event, d) {
+                    const mouseX = event.pageX;
+                    const mouseY = event.pageY;
+                    tooltip.style("left", (mouseX + 5) + "px")
+                           .style("top", (mouseY - 28) + "px")
+                           .html(`Region: ${region}<br>Year: ${d[0].Year}<br>CO2 Reduction: ${d[0]["Total CO2 Emissions Reduction (kg)"].toFixed(2)} kg`);
+                })
+                .on("mouseout", function() {
+                    tooltip.style("opacity", 0);
+                });
         });
 
         // Add legend
         const legend = svg.append("g")
-                          .attr("transform", `translate(${width - 150}, 20)`);
+                          .attr("transform", `translate(${width - 120}, 20)`); // Move to the right corner
 
         regions.forEach((region, i) => {
             legend.append("rect")
