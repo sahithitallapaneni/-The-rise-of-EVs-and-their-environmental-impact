@@ -108,15 +108,13 @@
             height: 600px;
             margin: 40px 0;
         }
-        #heatmap {
-    width: 100%;
-    height: 600px;
-    margin: 0 auto;
-    padding: 40px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+      
          #line-chart {
+        width: 800px;
+        height: 500px;
+        margin: 0 auto;
+    }
+         #scatter-plot {
         width: 800px;
         height: 500px;
         margin: 0 auto;
@@ -208,7 +206,7 @@
         <!-- Section 2: Environmental Impact -->
         <div class="section-title">Environmental Impact</div>
         <div class="content-section">
-            <p>EVs significantly reduce greenhouse gas emissions compared to traditional vehicles. However, understanding their full environmental impact requires considering electricity sources and battery production emissions.</p>
+            <p>EVs significantly reduce greenhouse gas emissions compared to traditional vehicles. However, understanding their full environmental impact requires considering electricity sources and battery production emissions.Below is graph showing CO2 emmisions of various countries over the years.</p>
         </div>
         <div id="line-chart"></div>
 
@@ -295,81 +293,86 @@
 
 
         <!-- Section 3: Heat Map and Scatter Plot -->
-        <div class="section-title">Heat Map and Scatter Plot</div>
+        <div class="section-title"> Scatter Plot</div>
         <div class="content-section">
-            <p>Visualizing data through heat maps and scatter plots provides insights into EV adoption trends and charging station distribution across different regions.</p>
+            <p>Visualizing data through scatter plots provides insights into charging station distribution. </p>
         </div>
-        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <div id="scatter-plot"></div>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-    // Load the CSV data for EV charging points
-    d3.csv("Dev 1/datasets/EV charging pointsHistoricalEV.csv").then(function(data) {
+    // Set up chart dimensions
+    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+          width = 800 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
 
-        // Parse the data
+    // Create SVG container
+    const svg = d3.select("#scatter-plot")
+                  .append("svg")
+                  .attr("width", width + margin.left + margin.right)
+                  .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Load CSV data
+    d3.csv("charging_points.csv").then(data => {
+        // Parse data
         data.forEach(d => {
-            d.year = +d.year;  // Convert year to number
-            d.value = +d.value;  // Convert value to number
+            d.year = +d.year;
+            d.value = +d.value;
         });
 
-        // Set up chart dimensions
-        const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-              width = 800 - margin.left - margin.right,
-              height = 600 - margin.top - margin.bottom;
+        // Set up scales
+        const x = d3.scaleLinear()
+                    .domain(d3.extent(data, d => d.year))
+                    .range([0, width]);
 
-        const svg = d3.select("#heatmap")
-                      .append("svg")
-                      .attr("width", width + margin.left + margin.right)
-                      .attr("height", height + margin.top + margin.bottom)
-                      .append("g")
-                      .attr("transform", `translate(${margin.left},${margin.top})`);
+        const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d.value)])
+                    .range([height, 0]);
 
-        // Get the unique regions and years
-        const regions = Array.from(new Set(data.map(d => d.region)));
-        const years = Array.from(new Set(data.map(d => d.year)));
-
-        // Set up color scale (color intensity for values)
-        const color = d3.scaleSequential(d3.interpolateViridis)
-                        .domain([0, d3.max(data, d => d.value)]);
-
-        // Set up scales for x and y axes
-        const x = d3.scaleBand()
-                    .domain(years)
-                    .range([0, width])
-                    .padding(0.05);
-
-        const y = d3.scaleBand()
-                    .domain(regions)
-                    .range([0, height])
-                    .padding(0.05);
-
-        // Add the x and y axes
+        // X and Y axis
         svg.append("g")
            .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x));
+           .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
         svg.append("g")
            .call(d3.axisLeft(y));
 
-        // Add the heatmap cells
-        svg.selectAll(".cell")
+        // Add points to scatter plot
+        svg.selectAll("circle")
            .data(data)
            .enter()
-           .append("rect")
-           .attr("class", "cell")
-           .attr("x", d => x(d.year))
-           .attr("y", d => y(d.region))
-           .attr("width", x.bandwidth())
-           .attr("height", y.bandwidth())
-           .attr("fill", d => color(d.value));
+           .append("circle")
+           .attr("cx", d => x(d.year))
+           .attr("cy", d => y(d.value))
+           .attr("r", 6)
+           .attr("fill", d => d.mode === "Publicly available fast" ? "#1f77b4" : "#ff7f0e")
+           .attr("opacity", 0.8);
 
-        // Add title or labels for the heatmap
-        svg.append("text")
-           .attr("x", width / 2)
-           .attr("y", -20)
-           .attr("text-anchor", "middle")
-           .attr("font-size", "20px")
-           .text("Heatmap of EV Charging Points by Region and Year");
+        // Add legend
+        const legend = svg.append("g")
+                          .attr("transform", `translate(${width - 150}, 20)`);
+
+        const modes = ["Publicly available fast", "Publicly available slow"];
+        const colors = ["#1f77b4", "#ff7f0e"];
+
+        modes.forEach((mode, i) => {
+            legend.append("rect")
+                  .attr("x", 0)
+                  .attr("y", i * 20)
+                  .attr("width", 10)
+                  .attr("height", 10)
+                  .style("fill", colors[i]);
+
+            legend.append("text")
+                  .attr("x", 20)
+                  .attr("y", i * 20 + 9)
+                  .text(mode)
+                  .attr("alignment-baseline", "middle");
+        });
     });
 </script>
+
 
 
         <!-- Section 4: Emissions of EVs Battery Production -->
