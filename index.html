@@ -102,99 +102,61 @@
             }
         }
 
-    
-         #line-chart {
-        width: 800px;
-        height: 500px;
-        margin: 0 auto;
-    }
-
-
         .chart-container {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin: 40px 0;
-  }
-
-   .pie-chart {
-      width: 45%;
-      height: 500px;
-      background-color: #f9f9f9;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-  }
-
-  .tooltip {
-      position: absolute;
-      background-color: white;
-      border: 1px solid #ccc;
-      padding: 5px;
-      font-size: 0.9rem;
-      pointer-events: none;
-      opacity: 0;
-  
-  }
-         
-         .chart-container {
-    width: 800px;
-    height: 500px;
-    margin: 20px auto;
-    position: relative;
-  }
-
-  .bar {
-    stroke-width: 1;
-  }
-
-  .axis path,
-  .axis line {
-    fill: none;
-    shape-rendering: crispEdges;
-  }
-
-  .x-axis path {
-    display: none;
-  }
-
-  .x-label,
-  .y-label {
-    font-size: 14px;
-    font-weight: bold;
-    fill: #333;
-  }
-
-  .legend {
-    font-size: 12px;
-    font-weight: bold;
-    text-anchor: start;
-  }
-
-  .legend-rect {
-    width: 18px;
-    height: 18px;
-    stroke-width: 0.5px;
-  }
-
-  .tooltip {
-    position: absolute;
-    background-color: white;
-    border: 1px solid #ccc;
-    padding: 8px;
-    font-size: 12px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-        #stacked-bar-chart {
             width: 800px;
             height: 500px;
-            margin: 0 auto;
+            margin: 20px auto;
+            position: relative;
         }
 
+        .pie-chart {
+            width: 45%;
+            height: 500px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
 
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 5px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        #bar-chart, #line-chart, #stacked-bar-chart {
+            width: 800px;
+            height: 500px;
+            margin: 20px auto;
+        }
+
+        .legend {
+            font-size: 12px;
+            font-weight: bold;
+            text-anchor: start;
+        }
+
+        .legend-rect {
+            width: 18px;
+            height: 18px;
+            stroke-width: 0.5px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 8px;
+            font-size: 12px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -212,175 +174,184 @@
             <p>The rise of Electric Vehicles (EVs) marks a transformative era in transportation. With advancements in battery technology and global initiatives to reduce carbon emissions, EVs are rapidly gaining traction worldwide.</p>
         </div>
 
-        <!-- Line Chart for EV Sales -->
-        <div id="bar-chart"></div>  <!-- This is the container for the line chart -->
-
-       <script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-    // Load the CSV data for EV sales
-    d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(data) {
-        // Parse the data
-        data.forEach(d => {
-            d.year = +d.year;
-            d.value = +d.value;
-        });
-
-        // Set up chart dimensions
-        const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-              width = 800 - margin.left - margin.right,
-              height = 600 - margin.top - margin.bottom;
-
-        const svg = d3.select("#bar-chart")  // Changed id to #bar-chart
-                      .append("svg")
-                      .attr("width", width + margin.left + margin.right)
-                      .attr("height", height + margin.top + margin.bottom)
-                      .append("g")
-                      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-        // X and Y scales
-        const x = d3.scaleBand()
-                    .domain(data.map(d => d.year))  // X-axis is based on years
-                    .range([0, width])
-                    .padding(0.1);
-
-        const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.value)])  // Y-axis is based on values
-                    .range([height, 0]);
-
-        // Append X and Y axes
-        svg.append("g")
-           .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x));
-
-        svg.append("g")
-           .call(d3.axisLeft(y));
-
-        // Create bars for the chart
-        svg.selectAll(".bar")
-           .data(data)
-           .enter()
-           .append("rect")
-           .attr("class", "bar")
-           .attr("x", d => x(d.year))
-           .attr("y", d => y(d.value))
-           .attr("width", x.bandwidth())
-           .attr("height", d => height - y(d.value))
-           .attr("fill", "#3498db");
-
-        // Add chart title
-        svg.append("text")
-           .attr("x", width / 2)
-           .attr("y", -20)
-           .attr("text-anchor", "middle")
-           .style("font-size", "20px")
-           .text("EV Sales Growth Over Time");
-    });
-</script>
-
+        <!-- Bar Chart for EV Sales -->
+        <div id="bar-chart"></div> 
 
         <!-- Section 2: Environmental Impact -->
         <div class="section-title">Environmental Impact</div>
         <div class="content-section">
-            <p>EVs significantly reduce greenhouse gas emissions compared to traditional vehicles. However, understanding their full environmental impact requires considering electricity sources and battery production emissions.Below is graph showing CO2 emmisions of various countries over the years.</p>
+            <p>EVs significantly reduce greenhouse gas emissions compared to traditional vehicles. However, understanding their full environmental impact requires considering electricity sources and battery production emissions. Below is a graph showing CO2 emissions of various countries over the years.</p>
         </div>
         <div id="line-chart"></div>
 
-        <script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-    // Set up the chart dimensions
-    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-          width = 800 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
-
-    // Create SVG container
-    const svg = d3.select("#line-chart")
-                  .append("svg")
-                  .attr("width", width + margin.left + margin.right)
-                  .attr("height", height + margin.top + margin.bottom)
-                  .append("g")
-                  .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // Load the CSV data
-    d3.csv("Dev 1/datasets/co2emissions.csv").then(data => {
-        // Parse data
-        data.forEach(d => {
-            d.Year = +d.Year;
-            d["Total CO2 Emissions Reduction (kg)"] = +d["Total CO2 Emissions Reduction (kg)"];
-        });
-
-        // Set up X and Y scales
-        const x = d3.scaleLinear()
-                    .domain(d3.extent(data, d => d.Year))
-                    .range([0, width]);
-
-        const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d["Total CO2 Emissions Reduction (kg)"])])
-                    .range([height, 0]);
-
-        // Add X axis
-        svg.append("g")
-           .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x).tickFormat(d3.format("d"))); // Year format
-
-        // Add Y axis
-        svg.append("g")
-           .call(d3.axisLeft(y));
-
-        // Line generator
-        const line = d3.line()
-                       .x(d => x(d.Year))
-                       .y(d => y(d["Total CO2 Emissions Reduction (kg)"]));
-
-        // Bind data and draw line for each region
-        const regions = Array.from(new Set(data.map(d => d.Region)));
-        const color = d3.scaleOrdinal(d3.schemeCategory10).domain(regions);
-
-        regions.forEach(region => {
-            const regionData = data.filter(d => d.Region === region);
-            svg.append("path")
-               .datum(regionData)
-               .attr("fill", "none")
-               .attr("stroke", color(region))
-               .attr("stroke-width", 2)
-               .attr("d", line);
-        });
-
-        // Add legend
-        const legend = svg.append("g")
-                          .attr("transform", `translate(${width - 150}, 20)`);
-
-        regions.forEach((region, i) => {
-            legend.append("rect")
-                  .attr("x", 0)
-                  .attr("y", i * 20)
-                  .attr("width", 10)
-                  .attr("height", 10)
-                  .style("fill", color(region));
-
-            legend.append("text")
-                  .attr("x", 20)
-                  .attr("y", i * 20 + 9)
-                  .text(region)
-                  .attr("alignment-baseline", "middle");
-        });
-    });
-</script>
-
-
-        <!-- Section 3: stacked bar chart and Pie chart -->
-        <div class="section-title"> Stacked bar chart & Pie chart</div>
+        <!-- Section 3: Stacked Bar and Pie charts -->
+        <div class="section-title">Stacked Bar Chart & Pie Chart</div>
         <div class="content-section">
-            <p>Visualizing data through pie charts and stacked bar chart provides insights into charging station distribution. </p>
+            <p>Visualizing data through pie charts and stacked bar charts provides insights into charging station distribution.</p>
         </div>
-        
- <script>
-        // Load the CSV data from a local file
+        <div class="chart-container">
+            <div id="stacked-bar-chart"></div>
+            <div id="pie-chart" class="pie-chart"></div>
+        </div>
+
+        <!-- Section 4: Emissions of Battery Production -->
+        <div class="section-title">Emissions of Battery Production</div>
+        <div class="content-section">
+            <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- JavaScript and D3.js Script -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Bar Chart (EV Sales Growth) -->
+    <script>
+        d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(data) {
+            data.forEach(d => {
+                d.year = +d.year;
+                d.value = +d.value;
+            });
+
+            const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+                  width = 800 - margin.left - margin.right,
+                  height = 600 - margin.top - margin.bottom;
+
+            const svg = d3.select("#bar-chart").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleBand()
+                .domain(data.map(d => d.year))
+                .range([0, width])
+                .padding(0.1);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.value)])
+                .range([height, 0]);
+
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x));
+
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            svg.selectAll(".bar")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d.year))
+                .attr("y", d => y(d.value))
+                .attr("width", x.bandwidth())
+                .attr("height", d => height - y(d.value))
+                .attr("fill", "#3498db");
+
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", -20)
+                .attr("text-anchor", "middle")
+                .style("font-size", "20px")
+                .text("EV Sales Growth Over Time");
+        });
+    </script>
+
+       <!-- Line Chart (CO2 Emissions) -->
+    <script>
+        d3.csv("Dev 1/datasets/co2emissions.csv").then(function(data) {
+            data.forEach(d => {
+                d.Year = +d.Year;
+                d["Total CO2 Emissions Reduction (kg)"] = +d["Total CO2 Emissions Reduction (kg)"];
+            });
+
+            const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+                  width = 800 - margin.left - margin.right,
+                  height = 500 - margin.top - margin.bottom;
+
+            const svg = d3.select("#line-chart").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const x = d3.scaleLinear()
+                .domain([d3.min(data, d => d.Year), d3.max(data, d => d.Year)])
+                .range([0, width]);
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d["Total CO2 Emissions Reduction (kg)"])])
+                .range([height, 0]);
+
+            const line = d3.line()
+                .x(d => x(d.Year))
+                .y(d => y(d["Total CO2 Emissions Reduction (kg)"]));
+
+            svg.append("path")
+                .data([data])
+                .attr("class", "line")
+                .attr("d", line)
+                .attr("fill", "none")
+                .attr("stroke", "#2ecc71")
+                .attr("stroke-width", 2);
+
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x));
+
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", -20)
+                .attr("text-anchor", "middle")
+                .style("font-size", "20px")
+                .text("CO2 Emissions Reduction (kg) Over Time");
+
+            // Tooltip
+            const tooltip = d3.select("#tooltip");
+
+            svg.selectAll(".dot")
+                .data(data)
+                .enter().append("circle")
+                .attr("class", "dot")
+                .attr("cx", d => x(d.Year))
+                .attr("cy", d => y(d["Total CO2 Emissions Reduction (kg)"]))
+                .attr("r", 5)
+                .attr("fill", "#2ecc71")
+                .on("mouseover", function(event, d) {
+                    tooltip.transition().duration(200).style("opacity", 0.9);
+                    tooltip.html("Year: " + d.Year + "<br>CO2 Reduction: " + d["Total CO2 Emissions Reduction (kg)"] + " kg")
+                        .style("left", (event.pageX + 5) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function() {
+                    tooltip.transition().duration(200).style("opacity", 0);
+                });
+        });
+    </script>
+<!-- Section 3: Stacked Bar Chart & Pie Chart -->
+    <div class="section-title">Stacked Bar Chart & Pie Chart</div>
+    <div class="content-section">
+        <p>Visualizing data through pie charts and stacked bar charts provides insights into the distribution of charging stations by facility and fuel types.</p>
+    </div>
+
+    <!-- Stacked Bar Chart Container -->
+    <div id="stacked-bar-chart" class="content-section"></div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        // Load the CSV data for charging stations
         d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
-            // Parse the data to group by Facility Type and Fuel Type Code
+            // Parse and aggregate data by Facility Type and Fuel Type
             const fuelTypes = Array.from(new Set(data.map(d => d['Fuel Type Code'])));
             const facilities = Array.from(new Set(data.map(d => d['Facility Type'])));
 
-            // Aggregate data by Facility Type and Fuel Type
             const groupedData = d3.rollup(
                 data,
                 v => fuelTypes.map(ft => ({
@@ -395,7 +366,6 @@
                 ...Object.fromEntries(values.map(v => [v.type, v.value]))
             }));
 
-            // Setup dimensions
             const margin = { top: 40, right: 30, bottom: 60, left: 60 };
             const width = 800 - margin.left - margin.right;
             const height = 500 - margin.top - margin.bottom;
@@ -407,7 +377,7 @@
                 .append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`);
 
-            // Set up scales
+            // Scales for the chart
             const x = d3.scaleBand()
                 .domain(formattedData.map(d => d.facility))
                 .range([0, width])
@@ -421,7 +391,7 @@
                 .domain(fuelTypes)
                 .range(d3.schemeCategory10);
 
-            // X Axis
+            // Axes
             svg.append("g")
                 .attr("transform", `translate(0,${height})`)
                 .call(d3.axisBottom(x))
@@ -429,7 +399,6 @@
                 .attr("transform", "rotate(-45)")
                 .style("text-anchor", "end");
 
-            // Y Axis
             svg.append("g")
                 .call(d3.axisLeft(y));
 
@@ -438,7 +407,7 @@
                 .keys(fuelTypes)
                 .value((d, key) => d[key] || 0)(formattedData);
 
-            // Draw bars
+            // Draw stacked bars
             svg.selectAll("g.layer")
                 .data(stackedData)
                 .enter()
@@ -474,176 +443,160 @@
         });
     </script>
 
-        
+    <!-- Pie Chart Container -->
+    <div id="pie-chart" class="content-section"></div>
 
-    <!-- Container for Pie Chart -->
-    <div id="pie-chart" class="pie-chart"></div>
-</div>
-
-<div class="tooltip" id="tooltip"></div>
-
-         <!-- Container for stacked bar Chart -->
-    <div id="#stacked-bar-chart" class="#stacked-bar-chart"></div>
-</div>
-
-<div class="tooltip" id="tooltip"></div>
-
-        <script>
-  d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
-      const width = 400, height = 400, radius = Math.min(width, height) / 2;
-
-      const svg = d3.select("#pie-chart")
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .append("g")
-                    .attr("transform", `translate(${width / 2},${height / 2})`);
-
-      const facilityCounts = d3.rollup(
-          data,
-          v => v.length,
-          d => d["Facility Type"]
-      );
-
-      const pie = d3.pie()
-                    .value(d => d[1]);
-
-      const arc = d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(radius);
-
-      const color = d3.scaleOrdinal(d3.schemeSet3);
-
-      svg.selectAll("path")
-         .data(pie(Array.from(facilityCounts.entries())))
-         .enter().append("path")
-         .attr("d", arc)
-         .attr("fill", d => color(d.data[0]));
-
-      // Tooltip for interactivity
-      const tooltip = d3.select("#tooltip");
-
-      svg.selectAll("path")
-         .on("mouseover", (event, d) => {
-             tooltip.style("opacity", 1)
-                    .html(`${d.data[0]}: ${d.data[1]}`)
-                    .style("left", (event.pageX + 10) + "px")
-                    .style("top", (event.pageY - 20) + "px");
-         })
-         .on("mouseout", () => tooltip.style("opacity", 0));
-  });
-</script>
-
-        <!-- Section 4: Emissions of EVs Battery Production -->
-        <div class="section-title">Emissions of Battery Production</div>
-        <div class="content-section">
-            <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
-        </div>
-
-        <!-- Stacked Bar Chart Section -->
-        <div id="stacked-bar-chart" class="content-section"></div>
-
-    </div>
-    
-    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
-        // Load the CSV data
-        d3.csv("Dev 1/datasets/battery_emissions_dataset.csv").then(function(data) {
-            const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-                  width = 800 - margin.left - margin.right,
-                  height = 600 - margin.top - margin.bottom;
+        // Load the CSV data for the pie chart (Facility Type counts)
+        d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
+            const width = 400, height = 400, radius = Math.min(width, height) / 2;
 
-            const svg = d3.select("#stacked-bar-chart")
-                          .append("svg")
-                          .attr("width", width + margin.left + margin.right)
-                          .attr("height", height + margin.top + margin.bottom)
-                          .append("g")
-                          .attr("transform", `translate(${margin.left},${margin.top})`);
+            const svg = d3.select("#pie-chart")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", `translate(${width / 2},${height / 2})`);
 
-            const emissionTypes = ["Mining Emissions (kg CO2e)", "Processing Emissions (kg CO2e)"];
-            const countries = Array.from(new Set(data.map(d => d.Country)));
-
-            data.forEach(d => {
-                d["Mining Emissions (kg CO2e)"] = +d["Mining Emissions (kg CO2e)"];
-                d["Processing Emissions (kg CO2e)"] = +d["Processing Emissions (kg CO2e)"];
-            });
-
-            const emissionsByCountry = d3.rollup(
+            // Group data by Facility Type
+            const facilityCounts = d3.rollup(
                 data,
-                v => ({
-                    "Mining Emissions (kg CO2e)": d3.sum(v, d => d["Mining Emissions (kg CO2e)"]),
-                    "Processing Emissions (kg CO2e)": d3.sum(v, d => d["Processing Emissions (kg CO2e)"])
-                }),
-                d => d.Country
+                v => v.length,
+                d => d["Facility Type"]
             );
 
-            const formattedData = Array.from(emissionsByCountry, ([key, values]) => ({
-                Country: key,
-                ...values
-            }));
+            const pie = d3.pie()
+                .value(d => d[1]);
 
-            const stack = d3.stack().keys(emissionTypes);
-            const stackedData = stack(formattedData);
+            const arc = d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius);
 
-            const x = d3.scaleBand()
-                        .domain(countries)
-                        .range([0, width])
-                        .padding(0.2);
+            const color = d3.scaleOrdinal(d3.schemeSet3);
 
-            const y = d3.scaleLinear()
-                        .domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])])
-                        .range([height, 0]);
+            // Draw the pie chart
+            svg.selectAll("path")
+                .data(pie(Array.from(facilityCounts.entries())))
+                .enter().append("path")
+                .attr("d", arc)
+                .attr("fill", d => color(d.data[0]));
 
-            svg.append("g")
-               .attr("transform", `translate(0,${height})`)
-               .call(d3.axisBottom(x));
+            // Tooltip interactivity
+            const tooltip = d3.select("#tooltip");
 
-            svg.append("g")
-               .call(d3.axisLeft(y));
-
-            const color = d3.scaleOrdinal()
-                            .domain(emissionTypes)
-                            .range(["#1f77b4", "#ff7f0e"]);
-
-            svg.selectAll("g.layer")
-               .data(stackedData)
-               .enter()
-               .append("g")
-               .attr("class", "layer")
-               .attr("fill", d => color(d.key))
-               .selectAll("rect")
-               .data(d => d)
-               .enter()
-               .append("rect")
-               .attr("x", d => x(d.data.Country))
-               .attr("y", d => y(d[1]))
-               .attr("height", d => y(d[0]) - y(d[1]))
-               .attr("width", x.bandwidth());
-
-            const legend = svg.append("g")
-                              .attr("transform", `translate(${width - 150},20)`);
-
-            emissionTypes.forEach((type, i) => {
-                legend.append("rect")
-                      .attr("x", 0)
-                      .attr("y", i * 20)
-                      .attr("width", 10)
-                      .attr("height", 10)
-                      .style("fill", color(type));
-
-                legend.append("text")
-                      .attr("x", 20)
-                      .attr("y", i * 20 + 10)
-                      .text(type)
-                      .attr("alignment-baseline", "middle");
-            });
+            svg.selectAll("path")
+                .on("mouseover", (event, d) => {
+                    tooltip.style("opacity", 1)
+                        .html(`${d.data[0]}: ${d.data[1]}`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 20) + "px");
+                })
+                .on("mouseout", () => tooltip.style("opacity", 0));
         });
     </script>
+    <!-- Section 4: Emissions of EVs Battery Production -->
+<div class="section-title">Emissions of Battery Production</div>
+<div class="content-section">
+    <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
+</div>
 
+<!-- Stacked Bar Chart for Battery Emissions -->
+<div id="stacked-bar-chart" class="content-section"></div>
 
-    <footer>
-        <p>Conclusion: Environmental Cost of Battery Production should also be taken into consideration.</p>
-    </footer>
+<script>
+    // Load the CSV data for battery production emissions
+    d3.csv("Dev 1/datasets/battery_emissions_dataset.csv").then(function(data) {
+        const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+            width = 800 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+
+        const svg = d3.select("#stacked-bar-chart")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const emissionTypes = ["Mining Emissions (kg CO2e)", "Processing Emissions (kg CO2e)"];
+        const countries = Array.from(new Set(data.map(d => d.Country)));
+
+        // Parse and aggregate emissions data
+        data.forEach(d => {
+            d["Mining Emissions (kg CO2e)"] = +d["Mining Emissions (kg CO2e)"];
+            d["Processing Emissions (kg CO2e)"] = +d["Processing Emissions (kg CO2e)"];
+        });
+
+        // Scale setup
+        const x = d3.scaleBand()
+            .domain(countries)
+            .range([0, width])
+            .padding(0.2);
+
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d["Mining Emissions (kg CO2e)"] + d["Processing Emissions (kg CO2e)"])])
+            .range([height, 0]);
+
+        const color = d3.scaleOrdinal()
+            .domain(emissionTypes)
+            .range(d3.schemeSet2);
+
+        // Add X and Y Axis
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x));
+
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        // Stack data
+        const stackedData = d3.stack()
+            .keys(emissionTypes)
+            .value((d, key) => d[key] || 0)(data);
+
+        // Draw stacked bars
+        svg.selectAll("g.layer")
+            .data(stackedData)
+            .enter()
+            .append("g")
+            .attr("class", "layer")
+            .attr("fill", d => color(d.key))
+            .selectAll("rect")
+            .data(d => d)
+            .enter()
+            .append("rect")
+            .attr("x", d => x(d.data.Country))
+            .attr("y", d => y(d[1]))
+            .attr("height", d => y(d[0]) - y(d[1]))
+            .attr("width", x.bandwidth());
+
+        // Add legend
+        const legend = svg.append("g")
+            .attr("transform", `translate(${width - 100},${20})`);
+
+        emissionTypes.forEach((et, i) => {
+            legend.append("rect")
+                .attr("x", 0)
+                .attr("y", i * 20)
+                .attr("width", 18)
+                .attr("height", 18)
+                .attr("fill", color(et));
+
+            legend.append("text")
+                .attr("x", 24)
+                .attr("y", i * 20 + 14)
+                .text(et);
+        });
+    });
+</script>
+
+<!-- Tooltip section for battery emissions chart -->
+<div id="tooltip" class="tooltip"></div>
+
+<!-- Footer -->
+<footer>
+    <p>EV Environmental Impact Dashboard</p>
+    <p>Data Sources: <a href="https://www.energystar.gov/" target="_blank">Energy Star</a>, <a href="https://www.epa.gov/" target="_blank">EPA</a></p>
+</footer>
 
 </body>
 </html>
