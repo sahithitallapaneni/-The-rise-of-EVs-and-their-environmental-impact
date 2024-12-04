@@ -455,58 +455,108 @@
 </div>
 
 <div class="tooltip" id="tooltip"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.29/topojson.min.js"></script>
 
-         <!-- Container for stacked bar Chart -->
-    <div id="#stacked-bar-chart" class="#stacked-bar-chart"></div>
-</div>
+<script>
+    // Set up chart dimensions
+    const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+          width = 960 - margin.left - margin.right,
+          height = 600 - margin.top - margin.bottom;
 
-<div class="tooltip" id="tooltip"></div>
+    // Create SVG container
+    const svg = d3.select("#map")
+                  .append("svg")
+                  .attr("width", width + margin.left + margin.right)
+                  .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                  .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        <script>
-  d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
-      const width = 400, height = 400, radius = Math.min(width, height) / 2;
+    // Tooltip div
+    const tooltip = d3.select("body")
+                      .append("div")
+                      .attr("class", "tooltip")
+                      .style("position", "absolute")
+                      .style("opacity", 0)
+                      .style("background-color", "rgba(0, 0, 0, 0.7)")
+                      .style("color", "#fff")
+                      .style("padding", "5px")
+                      .style("border-radius", "5px");
 
-      const svg = d3.select("#pie-chart")
-                    .append("svg")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .append("g")
-                    .attr("transform", `translate(${width / 2},${height / 2})`);
+    // Load dataset and GeoJSON map data
+    d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
+        // Parse the data
+        data.forEach(d => {
+            d.Latitude = +d.Latitude;
+            d.Longitude = +d.Longitude;
+        });
 
-      const facilityCounts = d3.rollup(
-          data,
-          v => v.length,
-          d => d["Facility Type"]
-      );
+        // Set up projection (Simple Mercator)
+        const projection = d3.geoMercator()
+                             .center([0, 20])
+                             .scale(130)
+                             .translate([width / 2, height / 2]);
 
-      const pie = d3.pie()
-                    .value(d => d[1]);
+        // Create a path generator for GeoJSON
+        const path = d3.geoPath().projection(projection);
 
-      const arc = d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(radius);
+        // Load US map TopoJSON data for visualization
+        d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
+            // Draw the map
+            svg.append("path")
+               .datum(topojson.feature(us, us.objects.states))
+               .attr("fill", "#d3d3d3")
+               .attr("d", path);
 
-      const color = d3.scaleOrdinal(d3.schemeSet3);
+            // Add circles for each fuel station based on coordinates
+            const fuelTypeColor = d3.scaleOrdinal(d3.schemeCategory10);
+            const fuelTypes = Array.from(new Set(data.map(d => d['Fuel Type Code'])));
 
-      svg.selectAll("path")
-         .data(pie(Array.from(facilityCounts.entries())))
-         .enter().append("path")
-         .attr("d", arc)
-         .attr("fill", d => color(d.data[0]));
+            const stationGroups = svg.selectAll(".station")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class", "station");
 
-      // Tooltip for interactivity
-      const tooltip = d3.select("#tooltip");
+            stationGroups.append("circle")
+                .attr("cx", d => projection([d.Longitude, d.Latitude])[0])
+                .attr("cy", d => projection([d.Longitude, d.Latitude])[1])
+                .attr("r", 4)
+                .style("fill", d => fuelTypeColor(d['Fuel Type Code']))
+                .on("mouseover", function(event, d) {
+                    tooltip.style("opacity", 1);
+                    tooltip.html(`Station: ${d['Station Name']}<br>City: ${d.City}<br>Fuel Type: ${d['Fuel Type Code']}`)
+                           .style("left", (event.pageX + 5) + "px")
+                           .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function() {
+                    tooltip.style("opacity", 0);
+                });
 
-      svg.selectAll("path")
-         .on("mouseover", (event, d) => {
-             tooltip.style("opacity", 1)
-                    .html(`${d.data[0]}: ${d.data[1]}`)
-                    .style("left", (event.pageX + 10) + "px")
-                    .style("top", (event.pageY - 20) + "px");
-         })
-         .on("mouseout", () => tooltip.style("opacity", 0));
-  });
+            // Create the legend
+            const legend = svg.append("g")
+                              .attr("transform", `translate(${width - 120}, 20)`); // Move legend to the right
+
+            fuelTypes.forEach((fuelType, i) => {
+                legend.append("rect")
+                      .attr("x", 0)
+                      .attr("y", i * 20)
+                      .attr("width", 10)
+                      .attr("height", 10)
+                      .style("fill", fuelTypeColor(fuelType));
+
+                legend.append("text")
+                      .attr("x", 20)
+                      .attr("y", i * 20 + 9)
+                      .text(fuelType)
+                      .attr("alignment-baseline", "middle");
+            });
+        });
+    });
 </script>
+
+
+        
 
         <!-- Section 4: Emissions of EVs Battery Production -->
         <div class="section-title">Emissions of Battery Production</div>
