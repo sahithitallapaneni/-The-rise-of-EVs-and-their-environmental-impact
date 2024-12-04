@@ -456,16 +456,15 @@
 
 <div class="tooltip" id="tooltip"></div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.29/topojson.min.js"></script>
 
 <script>
     // Set up chart dimensions
     const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-          width = 960 - margin.left - margin.right,
-          height = 600 - margin.top - margin.bottom;
+          width = 800 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
 
     // Create SVG container
-    const svg = d3.select("#map")
+    const svg = d3.select("#scatter-plot")
                   .append("svg")
                   .attr("width", width + margin.left + margin.right)
                   .attr("height", height + margin.top + margin.bottom)
@@ -483,7 +482,7 @@
                       .style("padding", "5px")
                       .style("border-radius", "5px");
 
-    // Load dataset and GeoJSON map data
+    // Load the CSV dataset
     d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
         // Parse the data
         data.forEach(d => {
@@ -491,69 +490,70 @@
             d.Longitude = +d.Longitude;
         });
 
-        // Set up projection (Simple Mercator)
-        const projection = d3.geoMercator()
-                             .center([0, 20])
-                             .scale(130)
-                             .translate([width / 2, height / 2]);
+        // Set up scales for the scatter plot
+        const x = d3.scaleLinear()
+                    .domain([d3.min(data, d => d.Longitude), d3.max(data, d => d.Longitude)])
+                    .range([0, width]);
 
-        // Create a path generator for GeoJSON
-        const path = d3.geoPath().projection(projection);
+        const y = d3.scaleLinear()
+                    .domain([d3.min(data, d => d.Latitude), d3.max(data, d => d.Latitude)])
+                    .range([height, 0]);
 
-        // Load US map TopoJSON data for visualization
-        d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
-            // Draw the map
-            svg.append("path")
-               .datum(topojson.feature(us, us.objects.states))
-               .attr("fill", "#d3d3d3")
-               .attr("d", path);
+        // Add X axis
+        svg.append("g")
+           .attr("transform", `translate(0,${height})`)
+           .call(d3.axisBottom(x).ticks(6));
 
-            // Add circles for each fuel station based on coordinates
-            const fuelTypeColor = d3.scaleOrdinal(d3.schemeCategory10);
-            const fuelTypes = Array.from(new Set(data.map(d => d['Fuel Type Code'])));
+        // Add Y axis
+        svg.append("g")
+           .call(d3.axisLeft(y).ticks(6));
 
-            const stationGroups = svg.selectAll(".station")
-                .data(data)
-                .enter()
-                .append("g")
-                .attr("class", "station");
+        // Create circles for the scatter plot
+        const fuelTypeColor = d3.scaleOrdinal(d3.schemeCategory10);
+        const fuelTypes = Array.from(new Set(data.map(d => d['Fuel Type Code'])));
 
-            stationGroups.append("circle")
-                .attr("cx", d => projection([d.Longitude, d.Latitude])[0])
-                .attr("cy", d => projection([d.Longitude, d.Latitude])[1])
-                .attr("r", 4)
-                .style("fill", d => fuelTypeColor(d['Fuel Type Code']))
-                .on("mouseover", function(event, d) {
-                    tooltip.style("opacity", 1);
-                    tooltip.html(`Station: ${d['Station Name']}<br>City: ${d.City}<br>Fuel Type: ${d['Fuel Type Code']}`)
-                           .style("left", (event.pageX + 5) + "px")
-                           .style("top", (event.pageY - 28) + "px");
-                })
-                .on("mouseout", function() {
-                    tooltip.style("opacity", 0);
-                });
+        const stationGroups = svg.selectAll(".station")
+            .data(data)
+            .enter()
+            .append("g")
+            .attr("class", "station");
 
-            // Create the legend
-            const legend = svg.append("g")
-                              .attr("transform", `translate(${width - 120}, 20)`); // Move legend to the right
-
-            fuelTypes.forEach((fuelType, i) => {
-                legend.append("rect")
-                      .attr("x", 0)
-                      .attr("y", i * 20)
-                      .attr("width", 10)
-                      .attr("height", 10)
-                      .style("fill", fuelTypeColor(fuelType));
-
-                legend.append("text")
-                      .attr("x", 20)
-                      .attr("y", i * 20 + 9)
-                      .text(fuelType)
-                      .attr("alignment-baseline", "middle");
+        stationGroups.append("circle")
+            .attr("cx", d => x(d.Longitude))
+            .attr("cy", d => y(d.Latitude))
+            .attr("r", 4)
+            .style("fill", d => fuelTypeColor(d['Fuel Type Code']))
+            .on("mouseover", function(event, d) {
+                tooltip.style("opacity", 1);
+                tooltip.html(`Station: ${d['Station Name']}<br>City: ${d.City}<br>Fuel Type: ${d['Fuel Type Code']}`)
+                       .style("left", (event.pageX + 5) + "px")
+                       .style("top", (event.pageY - 28) + "px");
+            })
+            .on("mouseout", function() {
+                tooltip.style("opacity", 0);
             });
+
+        // Add legend for fuel types
+        const legend = svg.append("g")
+                          .attr("transform", `translate(${width - 150}, 20)`);
+
+        fuelTypes.forEach((fuelType, i) => {
+            legend.append("rect")
+                  .attr("x", 0)
+                  .attr("y", i * 20)
+                  .attr("width", 10)
+                  .attr("height", 10)
+                  .style("fill", fuelTypeColor(fuelType));
+
+            legend.append("text")
+                  .attr("x", 20)
+                  .attr("y", i * 20 + 9)
+                  .text(fuelType)
+                  .attr("alignment-baseline", "middle");
         });
     });
 </script>
+
 
 
         
