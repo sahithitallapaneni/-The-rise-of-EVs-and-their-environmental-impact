@@ -129,89 +129,66 @@
         <div id="line-chart"></div>  <!-- This is the container for the line chart -->
 
         <script src="https://d3js.org/d3.v7.min.js"></script>
-        <script>
-            // Load the CSV data for EV sales
-            d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(data) {
-                // Parse the data
-                data.forEach(d => {
-                    d.year = +d.year;
-                    d.value = +d.value;
-                });
+<script>
+    // Load the CSV data for EV sales
+    d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(data) {
+        // Parse the data
+        data.forEach(d => {
+            d.year = +d.year;
+            d.value = +d.value;
+        });
 
-                // Set up chart dimensions
-                const margin = { top: 50, right: 30, bottom: 50, left: 60 },
-                      width = 800 - margin.left - margin.right,
-                      height = 600 - margin.top - margin.bottom;
+        // Set up chart dimensions
+        const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+              width = 800 - margin.left - margin.right,
+              height = 600 - margin.top - margin.bottom;
 
-                const svg = d3.select("#line-chart")
-                            .append("svg")
-                            .attr("width", width + margin.left + margin.right)
-                            .attr("height", height + margin.top + margin.bottom)
-                            .append("g")
-                            .attr("transform", `translate(${margin.left},${margin.top})`);
+        const svg = d3.select("#bar-chart")  // Changed id to #bar-chart
+                      .append("svg")
+                      .attr("width", width + margin.left + margin.right)
+                      .attr("height", height + margin.top + margin.bottom)
+                      .append("g")
+                      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-                // Group data by region and powertrain
-                const regions = Array.from(new Set(data.map(d => d.region)));
-                const powertrains = Array.from(new Set(data.map(d => d.powertrain)));
+        // X and Y scales
+        const x = d3.scaleBand()
+                    .domain(data.map(d => d.year))  // X-axis is based on years
+                    .range([0, width])
+                    .padding(0.1);
 
-                const color = d3.scaleOrdinal(d3.schemeCategory10);
+        const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d.value)])  // Y-axis is based on values
+                    .range([height, 0]);
 
-                // X and Y scales
-                const x = d3.scaleLinear()
-                            .domain([d3.min(data, d => d.year), d3.max(data, d => d.year)])
-                            .range([0, width]);
+        // Append X and Y axes
+        svg.append("g")
+           .attr("transform", `translate(0,${height})`)
+           .call(d3.axisBottom(x));
 
-                const y = d3.scaleLinear()
-                            .domain([0, d3.max(data, d => d.value)])
-                            .range([height, 0]);
+        svg.append("g")
+           .call(d3.axisLeft(y));
 
-                // X and Y axes
-                svg.append("g")
-                .attr("transform", `translate(0,${height})`)
-                .call(d3.axisBottom(x));
+        // Create bars for the chart
+        svg.selectAll(".bar")
+           .data(data)
+           .enter()
+           .append("rect")
+           .attr("class", "bar")
+           .attr("x", d => x(d.year))
+           .attr("y", d => y(d.value))
+           .attr("width", x.bandwidth())
+           .attr("height", d => height - y(d.value))
+           .attr("fill", "#3498db");
 
-                svg.append("g")
-                .call(d3.axisLeft(y));
-
-                // Prepare the data for each region and powertrain
-                const line = d3.line()
-                               .x(d => x(d.year))
-                               .y(d => y(d.value));
-
-                // Draw lines for each region and powertrain
-                powertrains.forEach(powertrain => {
-                    regions.forEach(region => {
-                        const regionData = data.filter(d => d.region === region && d.powertrain === powertrain);
-                        svg.append("path")
-                           .data([regionData])
-                           .attr("class", "line")
-                           .attr("d", line)
-                           .attr("fill", "none")
-                           .attr("stroke", color(powertrain))
-                           .attr("stroke-width", 2);
-                    });
-                });
-
-                // Add legends for the powertrains
-                const legend = svg.append("g")
-                                  .attr("transform", `translate(${width - 150}, 20)`);
-
-                powertrains.forEach((powertrain, i) => {
-                    legend.append("rect")
-                          .attr("x", 0)
-                          .attr("y", i * 20)
-                          .attr("width", 10)
-                          .attr("height", 10)
-                          .style("fill", color(powertrain));
-
-                    legend.append("text")
-                          .attr("x", 20)
-                          .attr("y", i * 20 + 10)
-                          .text(powertrain)
-                          .attr("alignment-baseline", "middle");
-                });
-            });
-        </script>
+        // Add chart title
+        svg.append("text")
+           .attr("x", width / 2)
+           .attr("y", -20)
+           .attr("text-anchor", "middle")
+           .style("font-size", "20px")
+           .text("EV Sales Growth Over Time");
+    });
+</script>
 
         <!-- Section 2: Environmental Impact -->
         <div class="section-title">Environmental Impact</div>
