@@ -368,9 +368,9 @@
 
 
         <!-- Section 3: stacked bar chart and Pie chart -->
-        <div class="section-title"> Stacked bar chart & Pie chart</div>
+        <div class="section-title"> Pie chart for various types of charging stations</div>
         <div class="content-section">
-            <p>Visualizing data through pie charts and stacked bar chart provides insights into charging station distribution. </p>
+            <p>Visualizing data through pie charts provides insights into charging station distribution. </p>
         </div>
         
  <script>
@@ -637,7 +637,10 @@
             });
         });
     </script>
-<div class="section-title">Time Series Graph: EV Sales and CO2 Emissions Reduction</div>
+<div class="section-title"> Stacked bar chart for various types of charging stations</div>
+        <div class="content-section">
+            <p>Visualizing data through stacked bar charts provides insights into charging station distribution. </p>
+        </div>
 <svg width="800" height="500"></svg>
 
     <script>
@@ -741,7 +744,112 @@
             console.log(error);
         });
     </script>
+<div>
+    <svg width="800" height="500"></svg>
 
+    <script>
+        // Set the margins and dimensions for the SVG container
+        const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+        const width = 800 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+
+        // Create the SVG container
+        const svg = d3.select("svg")
+                      .attr("width", width + margin.left + margin.right)
+                      .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // Load the CSV file from the GitHub repository
+        d3.csv("datasets/merged_ev_co2_data.csv").then(function(data) {
+            // Parse the data to convert the columns to the correct data types
+            data.forEach(function(d) {
+                d.Year = +d.Year;
+                d['Total CO2 Emissions Reduction (kg)'] = +d['Total CO2 Emissions Reduction (kg)'];
+                d['EV Sales'] = +d['EV Sales'];
+            });
+
+            // Set up the x and y scales
+            const x = d3.scaleLinear()
+                        .domain(d3.extent(data, d => d.Year))
+                        .range([0, width]);
+
+            const y1 = d3.scaleLinear()
+                        .domain([0, d3.max(data, d => d['EV Sales'])])
+                        .range([height, 0]);
+
+            const y2 = d3.scaleLinear()
+                        .domain([0, d3.max(data, d => d['Total CO2 Emissions Reduction (kg)'])])
+                        .range([height, 0]);
+
+            // Define the lines for EV Sales and CO2 Emissions
+            const line1 = d3.line()
+                            .x(d => x(d.Year))
+                            .y(d => y1(d['EV Sales']));
+
+            const line2 = d3.line()
+                            .x(d => x(d.Year))
+                            .y(d => y2(d['Total CO2 Emissions Reduction (kg)']));
+
+            // Add the lines to the SVG
+            svg.append("path")
+               .data([data])
+               .attr("class", "line")
+               .attr("d", line1)
+               .attr("stroke", "blue")
+               .attr("stroke-width", 2)
+               .attr("fill", "none");
+
+            svg.append("path")
+               .data([data])
+               .attr("class", "line")
+               .attr("d", line2)
+               .attr("stroke", "green")
+               .attr("stroke-width", 2)
+               .attr("fill", "none");
+
+            // Add the x axis
+            svg.append("g")
+               .attr("class", "axis")
+               .attr("transform", `translate(0, ${height})`)
+               .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+            // Add the y axis for EV Sales
+            svg.append("g")
+               .attr("class", "axis")
+               .call(d3.axisLeft(y1));
+
+            // Add the y axis for CO2 Emissions Reduction
+            svg.append("g")
+               .attr("class", "axis")
+               .attr("transform", `translate(${width}, 0)`)
+               .call(d3.axisRight(y2));
+
+            // Add labels to the axes
+            svg.append("text")
+               .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 5})`)
+               .style("text-anchor", "middle")
+               .text("Year");
+
+            svg.append("text")
+               .attr("transform", "rotate(-90)")
+               .attr("y", -margin.left + 20)
+               .attr("x", -height / 2)
+               .style("text-anchor", "middle")
+               .text("EV Sales (Units)");
+
+            svg.append("text")
+               .attr("transform", "rotate(90)")
+               .attr("y", width + margin.right - 20)
+               .attr("x", height / 2)
+               .style("text-anchor", "middle")
+               .text("CO2 Emissions Reduction (kg)");
+
+        }).catch(function(error) {
+            console.log(error);
+        });
+    </script>
+</div>
 
 <!-- Footer -->
 <footer>
