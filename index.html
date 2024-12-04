@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stacked Bar Chart - Emissions by Country</title>
+    <title>Rise of EVs & Environmental Impact</title>
     <style>
+        /* Base Styles */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -12,26 +13,129 @@
             background-color: #f5f7fa;
             color: #333;
         }
+
+        /* Huge Main Heading */
+        header {
+            color: black;
+            text-align: center;
+            padding: 80px 20px;
+        }
+        h1:hover {
+            transform: scale(1.2);  /* Makes the heading grow */
+            color: #f1c40f;         /* Changes color to gold */
+        }
+
+        header h1 {
+            font-size: 4rem;
+            margin: 0;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Side Headings */
         .section-title {
             font-size: 2.5rem;
             text-align: center;
-            margin: 40px 0;
+            margin: 60px 0 20px;
+            color: #2c3e50;
+            transition: transform 0.3s ease;
         }
-        .chart-container {
-            width: 900px;
+
+        .section-title:hover {
+            transform: scale(1.1);
+            color: #e74c3c;
+        }
+
+        /* Section Layout */
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
         }
-        #stacked-bar-chart {
-            width: 100%;
-            height: 600px;
+
+        .content-section {
+            margin-bottom: 60px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .content-section p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* Footer */
+        footer {
+            background: #34495e;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 3rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="section-title">Stacked Bar Chart (Emissions by Country and Emission Type)</div>
-    <div class="chart-container">
-        <div id="stacked-bar-chart"></div>
-    </div>
+
+    <!-- Main Header -->
+    <header>
+        <h1>Rise of EVs & Their Environmental Impact</h1>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Section 1: Rise of EV -->
+        <div class="section-title">Rise of EV</div>
+        <div class="content-section">
+            <p>The rise of Electric Vehicles (EVs) marks a transformative era in transportation. With advancements in battery technology and global initiatives to reduce carbon emissions, EVs are rapidly gaining traction worldwide.</p>
+        </div>
+
+        <!-- Section 2: Environmental Impact -->
+        <div class="section-title">Environmental Impact</div>
+        <div class="content-section">
+            <p>EVs significantly reduce greenhouse gas emissions compared to traditional vehicles. However, understanding their full environmental impact requires considering electricity sources and battery production emissions.</p>
+        </div>
+
+        <!-- Section 3: Heat Map and Scatter Plot -->
+        <div class="section-title">Heat Map and Scatter Plot</div>
+        <div class="content-section">
+            <p>Visualizing data through heat maps and scatter plots provides insights into EV adoption trends and charging station distribution across different regions.</p>
+        </div>
+
+        <!-- Section 4: Emissions of EVs Battery Production -->
+        <div class="section-title">Emissions of Battery Production</div>
+        <div class="content-section">
+            <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
+        </div>
+
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
@@ -41,6 +145,7 @@
                   width = 800 - margin.left - margin.right,
                   height = 600 - margin.top - margin.bottom;
 
+
             const svg = d3.select("#stacked-bar-chart")
                           .append("svg")
                           .attr("width", width + margin.left + margin.right)
@@ -48,14 +153,17 @@
                           .append("g")
                           .attr("transform", `translate(${margin.left},${margin.top})`);
 
+
             // Prepare data for the stack layout
             const emissionTypes = ["Mining Emissions (kg CO2e)", "Processing Emissions (kg CO2e)"];
             const countries = Array.from(new Set(data.map(d => d.Country)));
+
 
             data.forEach(d => {
                 d["Mining Emissions (kg CO2e)"] = +d["Mining Emissions (kg CO2e)"];
                 d["Processing Emissions (kg CO2e)"] = +d["Processing Emissions (kg CO2e)"];
             });
+
 
             // Group by country and sum emissions
             const emissionsByCountry = d3.rollup(
@@ -67,14 +175,17 @@
                 d => d.Country
             );
 
+
             const formattedData = Array.from(emissionsByCountry, ([key, values]) => ({
                 Country: key,
                 ...values
             }));
 
+
             // Stack layout
             const stack = d3.stack().keys(emissionTypes);
             const stackedData = stack(formattedData);
+
 
             // X-axis scale
             const x = d3.scaleBand()
@@ -82,24 +193,29 @@
                         .range([0, width])
                         .padding(0.2);
 
+
             // Y-axis scale
             const y = d3.scaleLinear()
                         .domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])])
                         .range([height, 0]);
+
 
             // X-axis
             svg.append("g")
                .attr("transform", `translate(0,${height})`)
                .call(d3.axisBottom(x));
 
+
             // Y-axis
             svg.append("g")
                .call(d3.axisLeft(y));
+
 
             // Color scale
             const color = d3.scaleOrdinal()
                             .domain(emissionTypes)
                             .range(["#1f77b4", "#ff7f0e"]);
+
 
             // Draw bars
             svg.selectAll("g.layer")
@@ -117,9 +233,11 @@
                .attr("height", d => y(d[0]) - y(d[1]))
                .attr("width", x.bandwidth());
 
+
             // Legend
             const legend = svg.append("g")
                               .attr("transform", `translate(${width - 150},20)`);
+
 
             emissionTypes.forEach((type, i) => {
                 legend.append("rect")
@@ -129,6 +247,7 @@
                       .attr("height", 10)
                       .style("fill", color(type));
 
+
                 legend.append("text")
                       .attr("x", 20)
                       .attr("y", i * 20 + 10)
@@ -137,5 +256,13 @@
             });
         });
     </script>
+
+        <footer>
+            <p> Conclusion : Environmental Cost of Battery Production should also be taken into consideration</p>
+        </footer>
+
+    </div>
+  
+
 </body>
 </html>
