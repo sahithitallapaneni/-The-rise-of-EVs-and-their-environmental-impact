@@ -292,16 +292,7 @@
            .attr("y", d => y(d.value))
            .attr("width", x.bandwidth())
            .attr("height", d => height - y(d.value))
-           .attr("fill", "#3498db")
-           .on("mouseover", function(event, d) { // Tooltip on hover
-               tooltip.style("opacity", 1);
-               tooltip.html(`Year: ${d.year}<br>Sales: ${d.value}`)
-                      .style("left", (event.pageX + 5) + "px")
-                      .style("top", (event.pageY - 28) + "px");
-           })
-           .on("mouseout", function() {
-               tooltip.style("opacity", 0);
-           });
+           .attr("fill", "orange");
 
         // Add chart title
         svg.append("text")
@@ -311,7 +302,7 @@
            .style("font-size", "20px")
            .text("EV Sales Growth Over Time");
 
-        // Add labels on top of bars
+        // Add labels on top of bars (final value on top)
         svg.selectAll(".label")
            .data(data)
            .enter()
@@ -322,32 +313,6 @@
            .attr("text-anchor", "middle")
            .style("font-size", "12px")
            .text(d => d.value);
-
-        // Tooltip div
-        const tooltip = d3.select("body")
-                          .append("div")
-                          .attr("class", "tooltip")
-                          .style("position", "absolute")
-                          .style("opacity", 0)
-                          .style("background-color", "rgba(0, 0, 0, 0.7)")
-                          .style("color", "#fff")
-                          .style("padding", "5px")
-                          .style("border-radius", "5px");
-
-        // Legend
-        const legend = svg.append("g")
-                          .attr("transform", `translate(${width - 150}, 20)`);
-
-        legend.append("rect")
-              .attr("width", 20)
-              .attr("height", 20)
-              .attr("fill", "#3498db");
-
-        legend.append("text")
-              .attr("x", 30)
-              .attr("y", 15)
-              .style("font-size", "14px")
-              .text("EV Sales");
     });
 </script>
 
