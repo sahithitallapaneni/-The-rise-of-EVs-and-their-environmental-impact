@@ -5,17 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rise of EVs & Environmental Impact</title>
     <style>
+       .button-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
         .button {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             width: 100%;
-            max-width: 800px; /* Optional: limit max width */
-            padding: 40px;
-            margin: 10px 0;
-            font-size: 2rem;
             text-align: center;
+            font-size: 2rem;
             color: white;
             background-color: #007BFF;
-            border: none;
-            cursor: pointer;
             text-decoration: none;
             transition: background-color 0.3s;
         }
@@ -24,6 +28,12 @@
         }
         .button:active {
             background-color: #003d7a;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
         }
 
         
@@ -556,10 +566,11 @@
             });
         });
     </script>
+    <div class="button-container">
     <a href="index.html" class="button">Go to Homepage</a>
     <a href="co2emissions.html" class="button">CO2 emissions insights</a>
     <a href="merged.html" class="button">CO2 emissions & EV sales </a>
-
+    </div>
 
     <footer>
         <p>Conclusion: Environmental Cost of Battery Production should also be taken into consideration.</p>
