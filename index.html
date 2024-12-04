@@ -302,17 +302,6 @@
            .style("font-size", "20px")
            .text("EV Sales Growth Over Time");
 
-        // Add labels on top of bars (final value on top)
-        svg.selectAll(".label")
-           .data(data)
-           .enter()
-           .append("text")
-           .attr("class", "label")
-           .attr("x", d => x(d.year) + x.bandwidth() / 2)
-           .attr("y", d => y(d.value) - 5)
-           .attr("text-anchor", "middle")
-           .style("font-size", "12px")
-           .text(d => d.value);
     });
 </script>
 
