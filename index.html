@@ -3,110 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EV Sales Data Visualization</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Power BI Reports</title>
+
     <style>
-        .bar {
-            fill: steelblue;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
-        .bar:hover {
-            fill: orange;
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 30px;
         }
-        .axis-label {
-            font-size: 12px;
+
+        .report {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 30%;
+            margin: 10px;
+            text-align: center;
+            box-sizing: border-box;
         }
-        .chart {
-            margin: 20px;
+
+        .report iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .report {
+                width: 45%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .report {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>EV Sales Data: Buses, Cars, Trucks</h1>
+    <div class="container">
+        <!-- First Report -->
+        <div class="report">
+            <h2>Region CO2 Emissions</h2>
+            <iframe title="region-co2emissions" src="https://app.powerbi.com/view?r=eyJrIjoiMGJkZjlhOWItZjg2Ny00MGRhLTg4ODMtNTlmOWMzM2ZjZmMzIiwidCI6IjcwZGUxOTkyLTA3YzYtNDgwZi1hMzE4LWExYWZjYmEwMzk4MyIsImMiOjN9" frameborder="0" allowFullScreen="true"></iframe>
+        </div>
 
-    <div id="bus-chart" class="chart"></div>
-    <div id="car-chart" class="chart"></div>
-    <div id="truck-chart" class="chart"></div>
+        <!-- Second Report -->
+        <div class="report">
+            <h2>Sales Growth Analysis</h2>
+            <iframe title="sales-growth" src="https://app.powerbi.com/view?r=eyJrIjoiMGJkZjlhOWItZjg2Ny00MGRhLTg4ODMtNTlmOWMzM2ZjZmMzIiwidCI6IjcwZGUxOTkyLTA3YzYtNDgwZi1hMzE4LWExYWZjYmEwMzk4MyIsImMiOjN9" frameborder="0" allowFullScreen="true"></iframe>
+        </div>
 
-    <script>
-        // Load and process datasets for each category (Buses, Cars, Trucks)
-        d3.csv("Dev 1/datasets/EV salesHistoricalBuses.csv").then(function(busesData) {
-            createBarChart(busesData, "bus-chart", "Bus Sales Over Time");
-        });
-
-        d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(carsData) {
-            createBarChart(carsData, "car-chart", "Car Sales Over Time");
-        });
-
-        d3.csv("Dev 1/datasets/EV salesHistoricalTrucks.csv").then(function(trucksData) {
-            createBarChart(trucksData, "truck-chart", "Truck Sales Over Time");
-        });
-
-        // Function to create a bar chart
-        function createBarChart(data, containerId, title) {
-            // Process data to get sales by year
-            const salesData = d3.nest()
-                .key(d => d.year)
-                .rollup(values => d3.sum(values, d => +d.value))
-                .entries(data)
-                .map(d => ({ year: +d.key, sales: d.value }));
-
-            const margin = { top: 20, right: 30, bottom: 40, left: 40 };
-            const width = 800 - margin.left - margin.right;
-            const height = 400 - margin.top - margin.bottom;
-
-            const x = d3.scaleBand()
-                .domain(salesData.map(d => d.year))
-                .range([0, width])
-                .padding(0.1);
-
-            const y = d3.scaleLinear()
-                .domain([0, d3.max(salesData, d => d.sales)])
-                .nice()
-                .range([height, 0]);
-
-            const svg = d3.select(`#${containerId}`)
-                .append('svg')
-                .attr('width', width + margin.left + margin.right)
-                .attr('height', height + margin.top + margin.bottom)
-                .append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-
-            svg.selectAll('.bar')
-                .data(salesData)
-                .enter()
-                .append('rect')
-                .attr('class', 'bar')
-                .attr('x', d => x(d.year))
-                .attr('y', d => y(d.sales))
-                .attr('width', x.bandwidth())
-                .attr('height', d => height - y(d.sales));
-
-            svg.append('g')
-                .attr('class', 'x-axis')
-                .attr('transform', `translate(0,${height})`)
-                .call(d3.axisBottom(x).tickSize(0))
-                .selectAll('.tick text')
-                .attr('class', 'axis-label')
-                .style('text-anchor', 'middle');
-
-            svg.append('g')
-                .attr('class', 'y-axis')
-                .call(d3.axisLeft(y).ticks(5))
-                .selectAll('.tick text')
-                .attr('class', 'axis-label')
-                .style('text-anchor', 'middle');
-
-            svg.append('text')
-                .attr('x', width / 2)
-                .attr('y', -10)
-                .attr('text-anchor', 'middle')
-                .attr('font-size', '16px')
-                .attr('font-weight', 'bold')
-                .text(title);
-        }
-
-    </script>
+        <!-- Third Report -->
+        <div class="report">
+            <h2>EV Charging Infrastructure</h2>
+            <iframe title="ev-charging" src="https://app.powerbi.com/view?r=eyJrIjoiMGJkZjlhOWItZjg2Ny00MGRhLTg4ODMtNTlmOWMzM2ZjZmMzIiwidCI6IjcwZGUxOTkyLTA3YzYtNDgwZi1hMzE4LWExYWZjYmEwMzk4MyIsImMiOjN9" frameborder="0" allowFullScreen="true"></iframe>
+        </div>
+    </div>
 
 </body>
 </html>
