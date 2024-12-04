@@ -6,15 +6,6 @@
     <title>Rise of EVs & Environmental Impact</title>
     <style>
         /* Base Styles */
-         .chart-container {
-            width: 900px;
-            margin: 0 auto;
-        }
-        #stacked-bar-chart {
-            width: 100%;
-            height: 600px;
-        }
-
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -145,22 +136,18 @@
             <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
         </div>
 
-
-    
-
-        <footer>
-            <p> Conclusion : Environmental Cost of Battery Production should also be taken into consideration</p>
-        </footer>
+        <!-- Stacked Bar Chart Section -->
+        <div id="stacked-bar-chart" class="content-section"></div>
 
     </div>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
         // Load the CSV data
         d3.csv("Dev 1/datasets/battery_emissions_dataset.csv").then(function(data) {
             const margin = { top: 50, right: 30, bottom: 50, left: 60 },
                   width = 800 - margin.left - margin.right,
                   height = 600 - margin.top - margin.bottom;
-
 
             const svg = d3.select("#stacked-bar-chart")
                           .append("svg")
@@ -169,19 +156,14 @@
                           .append("g")
                           .attr("transform", `translate(${margin.left},${margin.top})`);
 
-
-            // Prepare data for the stack layout
             const emissionTypes = ["Mining Emissions (kg CO2e)", "Processing Emissions (kg CO2e)"];
             const countries = Array.from(new Set(data.map(d => d.Country)));
-
 
             data.forEach(d => {
                 d["Mining Emissions (kg CO2e)"] = +d["Mining Emissions (kg CO2e)"];
                 d["Processing Emissions (kg CO2e)"] = +d["Processing Emissions (kg CO2e)"];
             });
 
-
-            // Group by country and sum emissions
             const emissionsByCountry = d3.rollup(
                 data,
                 v => ({
@@ -191,49 +173,34 @@
                 d => d.Country
             );
 
-
             const formattedData = Array.from(emissionsByCountry, ([key, values]) => ({
                 Country: key,
                 ...values
             }));
 
-
-            // Stack layout
             const stack = d3.stack().keys(emissionTypes);
             const stackedData = stack(formattedData);
 
-
-            // X-axis scale
             const x = d3.scaleBand()
                         .domain(countries)
                         .range([0, width])
                         .padding(0.2);
 
-
-            // Y-axis scale
             const y = d3.scaleLinear()
                         .domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])])
                         .range([height, 0]);
 
-
-            // X-axis
             svg.append("g")
                .attr("transform", `translate(0,${height})`)
                .call(d3.axisBottom(x));
 
-
-            // Y-axis
             svg.append("g")
                .call(d3.axisLeft(y));
 
-
-            // Color scale
             const color = d3.scaleOrdinal()
                             .domain(emissionTypes)
                             .range(["#1f77b4", "#ff7f0e"]);
 
-
-            // Draw bars
             svg.selectAll("g.layer")
                .data(stackedData)
                .enter()
@@ -249,11 +216,8 @@
                .attr("height", d => y(d[0]) - y(d[1]))
                .attr("width", x.bandwidth());
 
-
-            // Legend
             const legend = svg.append("g")
                               .attr("transform", `translate(${width - 150},20)`);
-
 
             emissionTypes.forEach((type, i) => {
                 legend.append("rect")
@@ -263,7 +227,6 @@
                       .attr("height", 10)
                       .style("fill", color(type));
 
-
                 legend.append("text")
                       .attr("x", 20)
                       .attr("y", i * 20 + 10)
@@ -272,6 +235,10 @@
             });
         });
     </script>
+
+    <footer>
+        <p>Conclusion: Environmental Cost of Battery Production should also be taken into consideration.</p>
+    </footer>
 
 </body>
 </html>
