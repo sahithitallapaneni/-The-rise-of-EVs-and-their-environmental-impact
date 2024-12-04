@@ -447,16 +447,10 @@
             <p>Visualizing data through scatter plots and stacked bar chart provides insights into charging station distribution. </p>
         </div>
         
+<div id="1bar-chart"></div>
 
-        <div id="scatter-plot"></div>
-
-
-    <!-- Container for Pie Chart -->
-    <div id="pie-chart" class="pie-chart"></div>
-</div>
-
-<div class="tooltip" id="tooltip"></div>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+        
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 <script>
     // Set up chart dimensions
@@ -465,7 +459,7 @@
           height = 500 - margin.top - margin.bottom;
 
     // Create SVG container
-    const svg = d3.select("#scatter-plot")
+    const svg = d3.select("#1bar-chart")
                   .append("svg")
                   .attr("width", width + margin.left + margin.right)
                   .attr("height", height + margin.top + margin.bottom)
@@ -487,71 +481,79 @@
     d3.csv("Dev 1/datasets/alt_fuel_stations (Dec 2 2024).csv").then(function(data) {
         // Parse the data
         data.forEach(d => {
-            d.Latitude = +d.Latitude;
-            d.Longitude = +d.Longitude;
+            d['Fuel Type Code'] = d['Fuel Type Code'];
         });
 
-        // Set up scales for the scatter plot
-        const x = d3.scaleLinear()
-                    .domain([d3.min(data, d => d.Longitude), d3.max(data, d => d.Longitude)])
-                    .range([0, width]);
+        // Count the number of stations for each fuel type
+        const fuelTypeCount = d3.nest()
+            .key(d => d['Fuel Type Code'])
+            .rollup(v => v.length)
+            .entries(data);
+
+        // Set up X and Y scales
+        const x = d3.scaleBand()
+                    .domain(fuelTypeCount.map(d => d.key))
+                    .range([0, width])
+                    .padding(0.1);
 
         const y = d3.scaleLinear()
-                    .domain([d3.min(data, d => d.Latitude), d3.max(data, d => d.Latitude)])
+                    .domain([0, d3.max(fuelTypeCount, d => d.value)])
                     .range([height, 0]);
 
         // Add X axis
         svg.append("g")
            .attr("transform", `translate(0,${height})`)
-           .call(d3.axisBottom(x).ticks(6));
+           .call(d3.axisBottom(x));
 
         // Add Y axis
         svg.append("g")
-           .call(d3.axisLeft(y).ticks(6));
+           .call(d3.axisLeft(y));
 
-        // Create circles for the scatter plot
-        const fuelTypeColor = d3.scaleOrdinal(d3.schemeCategory10);
-        const fuelTypes = Array.from(new Set(data.map(d => d['Fuel Type Code'])));
+        // Create bars for the bar chart
+        svg.selectAll(".bar")
+           .data(fuelTypeCount)
+           .enter()
+           .append("rect")
+           .attr("class", "bar")
+           .attr("x", d => x(d.key))
+           .attr("y", d => y(d.value))
+           .attr("width", x.bandwidth())
+           .attr("height", d => height - y(d.value))
+           .attr("fill", "#3498db")
+           .on("mouseover", function(event, d) {
+               tooltip.style("opacity", 1);
+               tooltip.html(`Fuel Type: ${d.key}<br>Number of Stations: ${d.value}`)
+                      .style("left", (event.pageX + 5) + "px")
+                      .style("top", (event.pageY - 28) + "px");
+           })
+           .on("mouseout", function() {
+               tooltip.style("opacity", 0);
+           });
 
-        const stationGroups = svg.selectAll(".station")
-            .data(data)
-            .enter()
-            .append("g")
-            .attr("class", "station");
+        // Add chart title
+        svg.append("text")
+           .attr("x", width / 2)
+           .attr("y", -20)
+           .attr("text-anchor", "middle")
+           .style("font-size", "20px")
+           .text("Fuel Stations by Fuel Type");
 
-        stationGroups.append("circle")
-            .attr("cx", d => x(d.Longitude))
-            .attr("cy", d => y(d.Latitude))
-            .attr("r", 4)
-            .style("fill", d => fuelTypeColor(d['Fuel Type Code']))
-            .on("mouseover", function(event, d) {
-                tooltip.style("opacity", 1);
-                tooltip.html(`Station: ${d['Station Name']}<br>City: ${d.City}<br>Fuel Type: ${d['Fuel Type Code']}`)
-                       .style("left", (event.pageX + 5) + "px")
-                       .style("top", (event.pageY - 28) + "px");
-            })
-            .on("mouseout", function() {
-                tooltip.style("opacity", 0);
-            });
+        // Add X-axis label
+        svg.append("text")
+           .attr("x", width / 2)
+           .attr("y", height + margin.bottom - 10)
+           .attr("text-anchor", "middle")
+           .style("font-size", "14px")
+           .text("Fuel Type");
 
-        // Add legend for fuel types
-        const legend = svg.append("g")
-                          .attr("transform", `translate(${width - 150}, 20)`);
-
-        fuelTypes.forEach((fuelType, i) => {
-            legend.append("rect")
-                  .attr("x", 0)
-                  .attr("y", i * 20)
-                  .attr("width", 10)
-                  .attr("height", 10)
-                  .style("fill", fuelTypeColor(fuelType));
-
-            legend.append("text")
-                  .attr("x", 20)
-                  .attr("y", i * 20 + 9)
-                  .text(fuelType)
-                  .attr("alignment-baseline", "middle");
-        });
+        // Add Y-axis label
+        svg.append("text")
+           .attr("transform", "rotate(-90)")
+           .attr("x", -height / 2)
+           .attr("y", -40)
+           .attr("text-anchor", "middle")
+           .style("font-size", "14px")
+           .text("Number of Stations");
     });
 </script>
 
