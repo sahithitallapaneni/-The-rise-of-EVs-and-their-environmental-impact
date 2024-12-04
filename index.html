@@ -136,6 +136,12 @@
             <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
         </div>
 
+        <!-- Line Chart Section: EV Sales Over Time by Region and Powertrain -->
+        <div class="section-title">EV Sales Over Time by Region and Powertrain</div>
+        <div class="content-section">
+            <div id="line-chart"></div>
+        </div>
+
         <!-- Stacked Bar Chart Section -->
         <div id="stacked-bar-chart" class="content-section"></div>
 
@@ -143,7 +149,114 @@
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script>
-        // Load the CSV data
+        // Load the CSV data for EV sales
+        d3.csv("Dev 1/datasets/EV_salesHistoricalCars.csv").then(function(data) {
+            // Parse the data and convert relevant columns to numbers
+            data.forEach(d => {
+                d.year = +d.year;
+                d.value = +d.value;
+            });
+
+            // Set margins and dimensions for the line chart
+            const margin = { top: 50, right: 40, bottom: 50, left: 80 };
+            const width = 1000 - margin.left - margin.right;
+            const height = 600 - margin.top - margin.bottom;
+
+            // Create the SVG container for the line chart
+            const svg = d3.select("#line-chart")
+                          .append("svg")
+                          .attr("width", width + margin.left + margin.right)
+                          .attr("height", height + margin.top + margin.bottom)
+                          .append("g")
+                          .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Define the scales
+            const x = d3.scaleLinear()
+                        .domain(d3.extent(data, d => d.year))
+                        .range([0, width]);
+
+            const y = d3.scaleLinear()
+                        .domain([0, d3.max(data, d => d.value)])
+                        .range([height, 0]);
+
+            // Define line function
+            const line = d3.line()
+                           .x(d => x(d.year))
+                           .y(d => y(d.value));
+
+            // Group the data by region and powertrain type
+            const regions = Array.from(new Set(data.map(d => d.region)));
+            const powertrains = Array.from(new Set(data.map(d => d.powertrain)));
+
+            // Create a color scale
+            const color = d3.scaleOrdinal()
+                            .domain(powertrains)
+                            .range(d3.schemeCategory10);
+
+            // Append X-axis and Y-axis
+            svg.append("g")
+               .attr("transform", `translate(0,${height})`)
+               .call(d3.axisBottom(x).tickFormat(d3.format("d")))
+               .append("text")
+               .attr("x", width / 2)
+               .attr("y", 40)
+               .attr("class", "axis-label")
+               .style("text-anchor", "middle")
+               .text("Year");
+
+            svg.append("g")
+               .call(d3.axisLeft(y))
+               .append("text")
+               .attr("x", -40)
+               .attr("y", height / 2)
+               .attr("transform", "rotate(-90)")
+               .attr("class", "axis-label")
+               .style("text-anchor", "middle")
+               .text("EV Sales (Units)");
+
+            // Create a line for each powertrain type and region combination
+            powertrains.forEach(function(powertrain) {
+                // Filter data for the specific powertrain
+                const powertrainData = data.filter(d => d.powertrain === powertrain);
+
+                // Group the data by region
+                regions.forEach(function(region) {
+                    const regionData = powertrainData.filter(d => d.region === region);
+
+                    // Draw the line for each region
+                    svg.append("path")
+                       .data([regionData])
+                       .attr("class", "line")
+                       .attr("fill", "none")
+                       .attr("stroke", color(powertrain))
+                       .attr("stroke-width", 2)
+                       .attr("d", line)
+                       .append("title")
+                       .text(`${region} - ${powertrain}`);
+                });
+            });
+
+            // Create a legend
+            const legend = svg.append("g")
+                              .attr("transform", `translate(${width - 150}, 20)`);
+
+            powertrains.forEach((powertrain, i) => {
+                legend.append("rect")
+                      .attr("x", 0)
+                      .attr("y", i * 20)
+                      .attr("width", 10)
+                      .attr("height", 10)
+                      .style("fill", color(powertrain));
+
+                legend.append("text")
+                      .attr("x", 20)
+                      .attr("y", i * 20 + 10)
+                      .text(powertrain)
+                      .attr("alignment-baseline", "middle");
+            });
+        });
+
+         // Load the CSV data
         d3.csv("Dev 1/datasets/battery_emissions_dataset.csv").then(function(data) {
             const margin = { top: 50, right: 30, bottom: 50, left: 60 },
                   width = 800 - margin.left - margin.right,
@@ -242,3 +355,4 @@
 
 </body>
 </html>
+
