@@ -637,8 +637,8 @@
             });
         });
     </script>
-<h1>Time Series Graph: EV Sales and CO2 Emissions Reduction</h1>
-    <svg width="800" height="500"></svg>
+<div class="section-title">Time Series Graph: EV Sales and CO2 Emissions Reduction</div>
+<svg width="800" height="500"></svg>
 
     <script>
         // Set the margins and dimensions for the SVG container
@@ -653,7 +653,6 @@
                     .append("g")
                       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-        // Load the CSV file from the GitHub repository
         d3.csv("Dev2/datasets/merged_ev_co2_data.csv").then(function(data) {
             // Parse the data to convert the columns to the correct data types
             data.forEach(function(d) {
