@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rise of EVs & Environmental Impact</title>
+    <style>
+        #container {
+            text-align: center;
+            width: 1000;
+    height: 1000;
+        }
+        select {
+            font-size: 18px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        svg {
+            width: 100%;
+            height: 500px;
+            margin: auto;
+        }
+        .bar {
+            fill: #3498db;
+        }
+        .axis-label {
+            font-size: 14px;
+        }
+
+
+
+
+
+        
+    
+
+        
+        /* Base Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Huge Main Heading */
+        header {
+            color: black;
+            text-align: center;
+            padding: 80px 20px;
+        }
+        h1:hover {
+            transform: scale(1.2);  
+            color: #ff0000;        
+        }
+
+        header h1 {
+            font-size: 4rem;
+            margin: 0;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Side Headings */
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 60px 0 20px;
+            color: #2c3e50;
+            transition: transform 0.3s ease;
+        }
+
+        .section-title:hover {
+            transform: scale(1.1);
+            color: #e74c3c;
+        }
+
+        /* Section Layout */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .content-section {
+            margin-bottom: 60px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .content-section p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* Footer */
+        footer {
+            background: #34495e;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 3rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+    
+         #line-chart {
+        width: 100%;
+    height: 100%;
+        margin: 0 auto;
+    }
+
+
+        .chart-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin: 40px 0;
+  }
+
+
+  
+
+  .tooltip {
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+      font-size: 0.9rem;
+      pointer-events: none;
+      opacity: 0;
+  
+  }
+         
+         .chart-container {
+    width: 100%;
+    height: 100%;
+    margin: 20px auto;
+    position: relative;
+  }
+
+  .bar {
+    stroke-width: 1;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    shape-rendering: crispEdges;
+  }
+
+  .x-axis path {
+    display: none;
+  }
+
+  .x-label,
+  .y-label {
+    font-size: 14px;
+    font-weight: bold;
+    fill: #333;
+  }
+
+  .legend {
+    font-size: 12px;
+    font-weight: bold;
+    text-anchor: start;
+  }
+
+  .legend-rect {
+    width: 18px;
+    height: 18px;
+    stroke-width: 0.5px;
+  }
+
+  .tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 12px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+       
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 80%; /* Adjust the height as needed */
+    width: 50%;  /* Adjust width */
+}
+
+/* Top buttons styling */
+.top-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Space between top and bottom */
+}
+
+/* Bottom buttons styling */
+.bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* Common button styling */
+.btn {
+    padding: 15px 30px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+.btn:hover {
+    background-color: #2980b9;
+}
+
+/* Ensure buttons are equally spaced */
+.top-buttons .btn, .bottom-buttons .btn {
+    flex: 1;
+    margin: 0 10px;  /* Space between buttons */
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- Main Header -->
+    <header>
+        <h1>Rise of EVs & Their Environmental Impact</h1>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Section 1: Rise of EV -->
+        <div class="section-title">Rise of EV</div>
+        <div class="content-section">
+            <p>The rise of Electric Vehicles (EVs) marks a transformative era in transportation. With advancements in battery technology and global initiatives to reduce carbon emissions, EVs are rapidly gaining traction worldwide.</p>
+        </div>
+
+        <!-- Line Chart for EV Sales -->
+        <div id="bar-chart"></div>  <!-- This is the container for the line chart -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    // Load the CSV data for EV sales
+    d3.csv("Dev 1/datasets/EV salesHistoricalCars.csv").then(function(data) {
+        // Parse the data
+        data.forEach(d => {
+            d.year = +d.year;
+            d.value = +d.value;
+        });
+
+        // Set up chart dimensions
+        const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+              width = 800 - margin.left - margin.right,
+              height = 600 - margin.top - margin.bottom;
+
+        const svg = d3.select("#bar-chart")  // Changed id to #bar-chart
+                      .append("svg")
+                      .attr("width", width + margin.left + margin.right)
+                      .attr("height", height + margin.top + margin.bottom)
+                      .append("g")
+                      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        // X and Y scales
+        const x = d3.scaleBand()
+                    .domain(data.map(d => d.year))  // X-axis is based on years
+                    .range([0, width])
+                    .padding(0.1);
+
+        const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d.value)])  // Y-axis is based on values
+                    .range([height, 0]);
+
+        // Append X and Y axes
+        svg.append("g")
+           .attr("transform", `translate(0,${height})`)
+           .call(d3.axisBottom(x));
+
+        svg.append("g")
+           .call(d3.axisLeft(y));
+
+        // Create bars for the chart
+        svg.selectAll(".bar")
+           .data(data)
+           .enter()
+           .append("rect")
+           .attr("class", "bar")
+           .attr("x", d => x(d.year))
+           .attr("y", d => y(d.value))
+           .attr("width", x.bandwidth())
+           .attr("height", d => height - y(d.value))
+           .attr("fill", "orange")
+           .on("mouseover", function(event, d) { // Tooltip on hover
+               tooltip.style("opacity", 1);
+               tooltip.html(`Year: ${d.year}<br>Sales: ${d.value}`)
+                      .style("left", (event.pageX + 5) + "px")
+                      .style("top", (event.pageY - 28) + "px");
+           })
+           .on("mouseout", function() {
+               tooltip.style("opacity", 0);
+           });
+
+        // Add chart title
+        svg.append("text")
+           .attr("x", width / 2)
+           .attr("y", -20)
+           .attr("text-anchor", "middle")
+           .style("font-size", "20px")
+           .text("EV Sales Growth Over Time");
+
+        // Tooltip div
+        const tooltip = d3.select("body")
+                          .append("div")
+                          .attr("class", "tooltip")
+                          .style("position", "absolute")
+                          .style("opacity", 0)
+                          .style("background-color", "rgba(0, 0, 0, 0.7)")
+                          .style("color", "#fff")
+                          .style("padding", "5px")
+                          .style("border-radius", "5px");
+    });
+</script>
+
+
+
+
+        <!-- Section 2: Environmental Impact -->
+        <div class="section-title">Environmental Impact</div>
+        <div class="content-section">
+            <p>EVs significantly reduce greenhouse gas emissions compared to traditional vehicles. However, understanding their full environmental impact requires considering electricity sources and battery production emissions.Below is graph showing CO2 emmisions' reduction of various countries over the years.</p>
+        </div>
+        <div id="line-chart"></div>
+
+       <script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    // Set up the chart dimensions
+    const margin = { top: 50, right: 100, bottom: 50, left: 60 },
+          width = 800 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+
+    // Create SVG container
+    const svg = d3.select("#line-chart")
+                  .append("svg")
+                  .attr("width", width + margin.left + margin.right)
+                  .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Load the CSV data
+    d3.csv("Dev 1/datasets/co2emissions.csv").then(data => {
+        // Parse data
+        data.forEach(d => {
+            d.Year = +d.Year;
+            d["Total CO2 Emissions Reduction (kg)"] = +d["Total CO2 Emissions Reduction (kg)"];
+        });
+
+        // Set up X and Y scales
+        const x = d3.scaleLinear()
+                    .domain(d3.extent(data, d => d.Year))
+                    .range([0, width]);
+
+        const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d["Total CO2 Emissions Reduction (kg)"])] )
+                    .range([height, 0]);
+
+        // Add X axis
+        svg.append("g")
+           .attr("transform", `translate(0,${height})`)
+           .call(d3.axisBottom(x).tickFormat(d3.format("d"))); // Year format
+
+        // Add Y axis
+        svg.append("g")
+           .call(d3.axisLeft(y));
+
+        // Line generator
+        const line = d3.line()
+                       .x(d => x(d.Year))
+                       .y(d => y(d["Total CO2 Emissions Reduction (kg)"]));
+
+        // Bind data and draw line for each region
+        const regions = Array.from(new Set(data.map(d => d.Region)));
+        const color = d3.scaleOrdinal(d3.schemeCategory10).domain(regions);
+
+        // Tooltip div
+        const tooltip = d3.select("body")
+                          .append("div")
+                          .attr("class", "tooltip")
+                          .style("position", "absolute")
+                          .style("opacity", 0)
+                          .style("background-color", "rgba(0, 0, 0, 0.7)")
+                          .style("color", "#fff")
+                          .style("padding", "5px")
+                          .style("border-radius", "5px");
+
+        regions.forEach(region => {
+            const regionData = data.filter(d => d.Region === region);
+            const path = svg.append("path")
+                            .datum(regionData)
+                            .attr("fill", "none")
+                            .attr("stroke", color(region))
+                            .attr("stroke-width", 2)
+                            .attr("d", line);
+
+            // Add tooltip functionality to the lines
+            path.on("mouseover", function(event, d) {
+                    tooltip.style("opacity", 1);
+                })
+                .on("mousemove", function(event, d) {
+                    const mouseX = event.pageX;
+                    const mouseY = event.pageY;
+                    tooltip.style("left", (mouseX + 5) + "px")
+                           .style("top", (mouseY - 28) + "px")
+                           .html(`Region: ${region}<br>Year: ${d[0].Year}<br>CO2 Reduction: ${d[0]["Total CO2 Emissions Reduction (kg)"].toFixed(2)} kg`);
+                })
+                .on("mouseout", function() {
+                    tooltip.style("opacity", 0);
+                });
+        });
+
+        // Add legend
+        const legend = svg.append("g")
+                          .attr("transform", `translate(${width - 120}, 20)`); // Move to the right corner
+
+        regions.forEach((region, i) => {
+            legend.append("rect")
+                  .attr("x", 0)
+                  .attr("y", i * 20)
+                  .attr("width", 10)
+                  .attr("height", 10)
+                  .style("fill", color(region));
+
+            legend.append("text")
+                  .attr("x", 20)
+                  .attr("y", i * 20 + 9)
+                  .text(region)
+                  .attr("alignment-baseline", "middle");
+        });
+    });
+</script>
+
+
+        <!-- Section 3: Pie chart -->
+        <div class="section-title"> Do we need to consider anything else to come to a conclusion?</div>
+        <div class="content-section">
+            <p>These visualizations will help better understand the answer. </p>
+        </div>
+        <!-- Section 4: Emissions of EVs Battery Production -->
+        <div class="section-title">Emissions of Battery Production</div>
+        <div class="content-section">
+            <p>The production of EV batteries contributes to emissions, primarily due to mining and processing raw materials like lithium and cobalt. Efforts are ongoing to make this process more sustainable.</p>
+        </div>
+
+        <!-- Stacked Bar Chart Section -->
+        <div id="stacked-bar-chart" class="content-section"></div>
+
+    </div>
+    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        // Load the CSV data
+        d3.csv("Dev 1/datasets/battery_emissions_dataset.csv").then(function(data) {
+            const margin = { top: 50, right: 30, bottom: 50, left: 60 },
+                  width = 800 - margin.left - margin.right,
+                  height = 600 - margin.top - margin.bottom;
+
+            const svg = d3.select("#stacked-bar-chart")
+                          .append("svg")
+                          .attr("width", width + margin.left + margin.right)
+                          .attr("height", height + margin.top + margin.bottom)
+                          .append("g")
+                          .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const emissionTypes = ["Mining Emissions (kg CO2e)", "Processing Emissions (kg CO2e)"];
+            const countries = Array.from(new Set(data.map(d => d.Country)));
+
+            data.forEach(d => {
+                d["Mining Emissions (kg CO2e)"] = +d["Mining Emissions (kg CO2e)"];
+                d["Processing Emissions (kg CO2e)"] = +d["Processing Emissions (kg CO2e)"];
+            });
+
+            const emissionsByCountry = d3.rollup(
+                data,
+                v => ({
+                    "Mining Emissions (kg CO2e)": d3.sum(v, d => d["Mining Emissions (kg CO2e)"]),
+                    "Processing Emissions (kg CO2e)": d3.sum(v, d => d["Processing Emissions (kg CO2e)"])
+                }),
+                d => d.Country
+            );
+
+            const formattedData = Array.from(emissionsByCountry, ([key, values]) => ({
+                Country: key,
+                ...values
+            }));
+
+            const stack = d3.stack().keys(emissionTypes);
+            const stackedData = stack(formattedData);
+
+            const x = d3.scaleBand()
+                        .domain(countries)
+                        .range([0, width])
+                        .padding(0.2);
+
+            const y = d3.scaleLinear()
+                        .domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])])
+                        .range([height, 0]);
+
+            svg.append("g")
+               .attr("transform", `translate(0,${height})`)
+               .call(d3.axisBottom(x));
+
+            svg.append("g")
+               .call(d3.axisLeft(y));
+
+            const color = d3.scaleOrdinal()
+                            .domain(emissionTypes)
+                            .range(["#1f77b4", "#ff7f0e"]);
+
+            svg.selectAll("g.layer")
+               .data(stackedData)
+               .enter()
+               .append("g")
+               .attr("class", "layer")
+               .attr("fill", d => color(d.key))
+               .selectAll("rect")
+               .data(d => d)
+               .enter()
+               .append("rect")
+               .attr("x", d => x(d.data.Country))
+               .attr("y", d => y(d[1]))
+               .attr("height", d => y(d[0]) - y(d[1]))
+               .attr("width", x.bandwidth());
+
+            const legend = svg.append("g")
+                              .attr("transform", `translate(${width - 150},20)`);
+
+            emissionTypes.forEach((type, i) => {
+                legend.append("rect")
+                      .attr("x", 0)
+                      .attr("y", i * 20)
+                      .attr("width", 10)
+                      .attr("height", 10)
+                      .style("fill", color(type));
+
+                legend.append("text")
+                      .attr("x", 20)
+                      .attr("y", i * 20 + 10)
+                      .text(type)
+                      .attr("alignment-baseline", "middle");
+            });
+        });
+    </script>
+    <footer>
+        <p>Conclusion: Environmental Cost of Battery Production should also be taken into consideration.</p>
+    </footer>
+
+</body>
+</html>
